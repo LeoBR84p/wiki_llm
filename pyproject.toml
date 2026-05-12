@@ -23,3 +23,6 @@ dependencies = [
     "langchain-aws>=0.1",
     "langchain-openai>=0.1",
 ]
+
+[tool.uv.sources]
+markdown-hero = { path = "wheels/markdown_hero-0.1.0-py3-none-any.whl" }

@@ -372,7 +372,6 @@ WIKI_UI_PORT=8080
 
 ## Documentation
 
-- Detailed implementation plan: [`plano_implementacao.md`](plano_implementacao.md)
 - Full configuration example: [`config/exemplo_normas.py`](config/exemplo_normas.py)
 - markdown-hero reference: [docs/reference.md](https://github.com/LeoBR84p/markdown_hero/blob/main/docs/reference.md)
 
@@ -398,4 +397,6 @@ WIKI_UI_PORT=8080
 Questions, suggestions, and bug reports:
 
 - Email: [bernardo.leandro@gmail.com](mailto:bernardo.leandro@gmail.com)
+- Website: <https://www.leobr.site>
+- Buymeacoofee: <https://buymeacoffee.com/leobr>
 - Use the subject prefix `wiki-llm:`

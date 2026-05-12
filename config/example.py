@@ -1,10 +1,7 @@
-"""Configuração de exemplo — equivalente funcional ao EXAMPLE/wiki_ng/.
-
-Replica a estrutura do sistema de normas (NI + NE + Temas + Unidades) usando
-a nova API genérica de src/.
+"""Configuração de exemplo.
 
 Uso:
-    python -m src --config config/exemplo_normas.py tudo
+    python -m src --config config/exemplo.py tudo
 
 Variáveis de ambiente necessárias (ver .env.example):
     WIKI_BACKEND         — bedrock | openrouter | openai
@@ -14,7 +11,7 @@ Variáveis de ambiente necessárias (ver .env.example):
 
 Para testes gratuitos use OpenRouter com modelos free, ex:
     WIKI_BACKEND=openrouter
-    WIKI_MODEL_ID=mistralai/mistral-7b-instruct:free
+    WIKI_MODEL_ID=google/gemma-4-26b-a4b-it:free
 """
 
 from __future__ import annotations
@@ -66,23 +63,23 @@ llm_cfg = LLMConfig(
 # Entity Types
 # ---------------------------------------------------------------------------
 
-_ni = EntityTypeConfig(
-    name="Norma Interna",
-    slug="ni",
-    wiki_subdir="NI",
-    prompt_generate=_PROMPTS / "wiki_resumo.md",
-    prompt_evaluate=_PROMPTS / "wiki_avaliador.md",
-    frontmatter_fields=["area_gestora", "vigencia", "assunto"],
+_arts = EntityTypeConfig(
+    name="My Articles",
+    slug="articles",
+    wiki_subdir="arts",
+    prompt_generate=_PROMPTS / "wiki_summary_articles.md",
+    prompt_evaluate=_PROMPTS / "wiki_evaluate_articles.md",
+    frontmatter_fields=["theme", "platform"],
     max_rounds=2,
 )
 
-_ne = EntityTypeConfig(
-    name="Norma Externa",
-    slug="ne",
-    wiki_subdir="NE",
-    prompt_generate=_PROMPTS / "wiki_resumo_ne.md",
-    prompt_evaluate=_PROMPTS / "wiki_avaliador.md",
-    frontmatter_fields=["orgao_emissor", "vigencia", "assunto"],
+_proj = EntityTypeConfig(
+    name="My Projects",
+    slug="projects",
+    wiki_subdir="proj",
+    prompt_generate=_PROMPTS / "wiki_summary_projects.md",
+    prompt_evaluate=_PROMPTS / "wiki_evaluate_projects.md",
+    frontmatter_fields=["theme", "articles", "technology_subject"],
     max_rounds=2,
 )
 
@@ -90,22 +87,22 @@ _ne = EntityTypeConfig(
 # Taxonomies
 # ---------------------------------------------------------------------------
 
-_temas = TaxonomyConfig(
-    name="Temas",
-    wiki_subdir="Temas",
-    section_header="## Conexões Temáticas",
-    prompt_normalize=_PROMPTS / "wiki_temas_normalizar.md",
-    prompt_create_page=_PROMPTS / "wiki_agente_criar_tema.md",
+_themes = TaxonomyConfig(
+    name="Themes",
+    wiki_subdir="themes",
+    section_header="## Theme Connections",
+    prompt_normalize=_PROMPTS / "wiki_themes_normalize.md",
+    prompt_create_page=_PROMPTS / "wiki_agent_create_theme.md",
 )
 
 # ---------------------------------------------------------------------------
-# Groupings (organizational units)
+# Groupings (workspaces)
 # ---------------------------------------------------------------------------
 
-_unidades = GroupingConfig(
-    name="Unidades",
-    wiki_subdir="Unidades",
-    metadata_field="area_gestora",
+_workspaces = GroupingConfig(
+    name="Workspace",
+    wiki_subdir="workspaces",
+    metadata_field="workspace",
 )
 
 # ---------------------------------------------------------------------------
@@ -113,20 +110,20 @@ _unidades = GroupingConfig(
 # ---------------------------------------------------------------------------
 
 config = WikiConfig(
-    wiki_name="Wiki de Normas",
+    wiki_name="My Wiki",
     wiki_dir=WIKI_DIR,
     log_dir=LOG_DIR,
     llm=llm_cfg,
-    entity_types=[_ni, _ne],
-    taxonomies=[_temas],
-    groupings=[_unidades],
+    entity_types=[_arts, _proj],
+    taxonomies=[_themes],
+    groupings=[_workspaces],
     # Prompts comuns
     prompt_editor=_PROMPTS / "wiki_editor.md",
     prompt_lint=_PROMPTS / "wiki_lint.md",
-    prompt_consolidate=_PROMPTS / "wiki_consolidar_temas.md",
+    prompt_consolidate=_PROMPTS / "wiki_consolidate_themes.md",
     prompt_chat=_PROMPTS / "wiki_chat.md",
     # Comportamento
-    status_filter=["vigente", "em_vigor", "ativo", ""],
+    status_filter=["staged", "production", ""],
     max_chars_input=80_000,
     on_llm_error="skip",
     export_word=False,
