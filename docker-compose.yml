@@ -1,0 +1,27 @@
+services:
+  pipeline:
+    image: ghcr.io/your-org/wiki-llm:latest
+    build: .
+    env_file: .env
+    volumes:
+      - ./content_new:/app/content_new
+      - ./content_processed:/app/content_processed
+      - ./content_error:/app/content_error
+      - ./wiki:/app/wiki
+      - ./config:/app/config
+      - ./logs:/app/logs
+    command: python -m src --config config/exemplo_normas.py tudo
+    profiles: ["pipeline"]
+
+  chat:
+    image: ghcr.io/your-org/wiki-llm:latest
+    build: .
+    env_file: .env
+    ports:
+      - "${WIKI_UI_PORT:-8080}:8080"
+    volumes:
+      - ./wiki:/app/wiki
+      - ./config:/app/config
+    command: python -m src --config config/exemplo_normas.py chat
+    profiles: ["chat"]
+    restart: unless-stopped

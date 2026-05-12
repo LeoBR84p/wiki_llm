@@ -1,0 +1,58 @@
+---
+# Pipeline executado como CronJob (padrão: toda madrugada às 02:00)
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: wiki-llm-pipeline
+  namespace: wiki-llm
+spec:
+  schedule: "0 2 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: pipeline
+              image: ghcr.io/your-org/wiki-llm:latest
+              command: ["python", "-m", "src", "--config", "config/exemplo_normas.py", "tudo"]
+              envFrom:
+                - configMapRef:
+                    name: wiki-llm-config
+                - secretRef:
+                    name: wiki-llm-secrets
+              volumeMounts:
+                - name: wiki-data
+                  mountPath: /app/wiki
+                - name: content-data
+                  mountPath: /app/content_new
+                - name: content-processed
+                  mountPath: /app/content_processed
+                - name: content-error
+                  mountPath: /app/content_error
+                - name: config
+                  mountPath: /app/config
+              resources:
+                requests:
+                  memory: "512Mi"
+                  cpu: "250m"
+                limits:
+                  memory: "2Gi"
+                  cpu: "2"
+          volumes:
+            - name: wiki-data
+              persistentVolumeClaim:
+                claimName: wiki-llm-wiki-pvc
+            - name: content-data
+              persistentVolumeClaim:
+                claimName: wiki-llm-content-pvc
+            - name: content-processed
+              persistentVolumeClaim:
+                claimName: wiki-llm-processed-pvc
+            - name: content-error
+              persistentVolumeClaim:
+                claimName: wiki-llm-error-pvc
+            - name: config
+              configMap:
+                name: wiki-llm-config-files

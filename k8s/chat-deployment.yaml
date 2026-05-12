@@ -1,0 +1,67 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-llm-chat
+  namespace: wiki-llm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wiki-llm-chat
+  template:
+    metadata:
+      labels:
+        app: wiki-llm-chat
+    spec:
+      containers:
+        - name: chat
+          image: ghcr.io/your-org/wiki-llm:latest
+          command: ["python", "-m", "src", "--config", "config/exemplo_normas.py", "chat"]
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: wiki-llm-config
+            - secretRef:
+                name: wiki-llm-secrets
+          volumeMounts:
+            - name: wiki-data
+              mountPath: /app/wiki
+              readOnly: true
+            - name: config
+              mountPath: /app/config
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 30
+      volumes:
+        - name: wiki-data
+          persistentVolumeClaim:
+            claimName: wiki-llm-wiki-pvc
+        - name: config
+          configMap:
+            name: wiki-llm-config-files
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wiki-llm-chat
+  namespace: wiki-llm
+spec:
+  selector:
+    app: wiki-llm-chat
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP

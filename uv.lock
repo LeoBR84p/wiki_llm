@@ -1,0 +1,210 @@
+version = 1
+revision = 3
+requires-python = ">=3.12"
+
+[[package]]
+name = "lxml"
+version = "6.1.0"
+source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
+sdist = { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0.tar.gz", hash = "sha256:bfd57d8008c4965709a919c3e9a98f76c2c7cb319086b3d26858250620023b13" }
+wheels = [
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:d2f17a16cd8751e8eb233a7e41aecdf8e511712e00088bf9be455f604cd0d28d" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:f0cea5b1d3e6e77d71bd2b9972eb2446221a69dc52bb0b9c3c6f6e5700592d93" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:fc46da94826188ed45cb53bd8e3fc076ae22675aea2087843d4735627f867c6d" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:9147d8e386ec3b82c3b15d88927f734f565b0aaadef7def562b853adca45784a" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:5715e0e28736a070f3f34a7ccc09e2fdcba0e3060abbcf61a1a5718ff6d6b105" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-manylinux_2_26_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:4937460dc5df0cdd2f06a86c285c28afda06aefa3af949f9477d3e8df430c485" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:bc783ee3147e60a25aa0445ea82b3e8aabb83b240f2b95d32cb75587ff781814" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-manylinux_2_28_i686.whl", hash = "sha256:40d9189f80075f2e1f88db21ef815a2b17b28adf8e50aaf5c789bfe737027f32" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-manylinux_2_31_armv7l.whl", hash = "sha256:05b9b8787e35bec69e68daf4952b2e6dfcfb0db7ecf1a06f8cdfbbac4eb71aad" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-manylinux_2_38_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:0f0f08beb0182e3e9a86fae124b3c47a7b41b7b69b225e1377db983802404e54" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:73becf6d8c81d4c76b1014dbd3584cb26d904492dcf73ca85dc8bff08dcd6d2d" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-musllinux_1_2_armv7l.whl", hash = "sha256:1ae225f66e5938f4fa29d37e009a3bb3b13032ac57eb4eb42afa44f6e4054e69" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-musllinux_1_2_ppc64le.whl", hash = "sha256:690022c7fae793b0489aa68a658822cea83e0d5933781811cabbf5ea3bcfe73d" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-musllinux_1_2_riscv64.whl", hash = "sha256:63aeafc26aac0be8aff14af7871249e87ea1319be92090bfd632ec68e03b16a5" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:264c605ab9c0e4aa1a679636f4582c4d3313700009fac3ec9c3412ed0d8f3e1d" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-win32.whl", hash = "sha256:56971379bc5ee8037c5a0f09fa88f66cdb7d37c3e38af3e45cf539f41131ac1f" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-win_amd64.whl", hash = "sha256:bba078de0031c219e5dd06cf3e6bf8fb8e6e64a77819b358f53bb132e3e03366" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp312-cp312-win_arm64.whl", hash = "sha256:c3592631e652afa34999a088f98ba7dfc7d6aff0d535c410bea77a71743f3819" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:a0092f2b107b69601adf562a57c956fbb596e05e3e6651cabd3054113b007e45" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:fc7140d7a7386e6b545d41b7358f4d02b656d4053f5fa6859f92f4b9c2572c4d" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:419c58fc92cc3a2c3fa5f78c63dbf5da70c1fa9c1b25f25727ecee89a96c7de2" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:37fabd1452852636cf38ecdcc9dd5ca4bba7a35d6c53fa09725deeb894a87491" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:a2853c8b2170cc6cd54a6b4d50d2c1a8a7aeca201f23804b4898525c7a152cfc" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-manylinux_2_26_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:8e369cbd690e788c8d15e56222d91a09c6a417f49cbc543040cba0fe2e25a79e" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e69aa6805905807186eb00e66c6d97a935c928275182eb02ee40ba00da9623b2" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-manylinux_2_28_i686.whl", hash = "sha256:4bd1bdb8a9e0e2dd229de19b5f8aebac80e916921b4b2c6ef8a52bc131d0c1f9" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-manylinux_2_31_armv7l.whl", hash = "sha256:cbd7b79cdcb4986ad78a2662625882747f09db5e4cd7b2ae178a88c9c51b3dfe" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-manylinux_2_38_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:43e4d297f11080ec9d64a4b1ad7ac02b4484c9f0e2179d9c4ef78e886e747b88" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:cc16682cc987a3da00aa56a3aa3075b08edb10d9b1e476938cfdbee8f3b67181" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-musllinux_1_2_armv7l.whl", hash = "sha256:d6d8efe71429635f0559579092bb5e60560d7b9115ee38c4adbea35632e7fa24" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-musllinux_1_2_ppc64le.whl", hash = "sha256:7e39ab3a28af7784e206d8606ec0e4bcad0190f63a492bca95e94e5a4aef7f6e" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-musllinux_1_2_riscv64.whl", hash = "sha256:9eb667bf50856c4a58145f8ca2d5e5be160191e79eb9e30855a476191b3c3495" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:7f4a77d6f7edf9230cee3e1f7f6764722a41604ee5681844f18db9a81ea0ec33" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-win32.whl", hash = "sha256:28902146ffbe5222df411c5d19e5352490122e14447e98cd118907ee3fd6ee62" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-win_amd64.whl", hash = "sha256:4a1503c56e4e2b38dc76f2f2da7bae69670c0f1933e27cfa34b2fa5876410b16" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp313-cp313-win_arm64.whl", hash = "sha256:e0af85773850417d994d019741239b901b22c6680206f46a34766926e466141d" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-macosx_10_15_universal2.whl", hash = "sha256:ab863fd37458fed6456525f297d21239d987800c46e67da5ef04fc6b3dd93ac8" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:6fd8b1df8254ff4fd93fd31da1fc15770bde23ac045be9bb1f87425702f61cc9" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:47024feaae386a92a146af0d2aeed65229bf6fff738e6a11dda6b0015fb8fd03" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:3f00972f84450204cd5d93a5395965e348956aaceaadec693a22ec743f8ae3eb" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:97faa0860e13b05b15a51fb4986421ef7a30f0b3334061c416e0981e9450ca4c" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-manylinux_2_26_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:972a6451204798675407beaad97b868d0c733d9a74dafefc63120b81b8c2de28" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:fe022f20bc4569ec66b63b3fb275a3d628d9d32da6326b2982584104db6d3086" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-manylinux_2_28_i686.whl", hash = "sha256:75c4c7c619a744f972f4451bf5adf6d0fb00992a1ffc9fd78e13b0bc817cc99f" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-manylinux_2_31_armv7l.whl", hash = "sha256:3648f20d25102a22b6061c688beb3a805099ea4beb0a01ce62975d926944d292" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-manylinux_2_38_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:77b9f99b17cbf14026d1e618035077060fc7195dd940d025149f3e2e830fbfcb" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:32662519149fd7a9db354175aa5e417d83485a8039b8aaa62f873ceee7ea4cad" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-musllinux_1_2_armv7l.whl", hash = "sha256:73d658216fc173cf2c939e90e07b941c5e12736b0bf6a99e7af95459cfe8eabb" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-musllinux_1_2_ppc64le.whl", hash = "sha256:ac4db068889f8772a4a698c5980ec302771bb545e10c4b095d4c8be26749616f" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-musllinux_1_2_riscv64.whl", hash = "sha256:45e9dfbd1b661eb64ba0d4dbe762bd210c42d86dd1e5bd2bdf89d634231beb43" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:89e8d73d09ac696a5ba42ec69787913d53284f12092f651506779314f10ba585" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-win32.whl", hash = "sha256:ebe33f4ec1b2de38ceb225a1749a2965855bffeef435ba93cd2d5d540783bf2f" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-win_amd64.whl", hash = "sha256:398443df51c538bd578529aa7e5f7afc6c292644174b47961f3bf87fe5741120" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314-win_arm64.whl", hash = "sha256:8c8984e1d8c4b3949e419158fda14d921ff703a9ed8a47236c6eb7a2b6cb4946" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-macosx_10_15_universal2.whl", hash = "sha256:1081dd10bc6fa437db2500e13993abf7cc30716d0a2f40e65abb935f02ec559c" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:dabecc48db5f42ba348d1f5d5afdc54c6c4cc758e676926c7cd327045749517d" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:e3dd5fe19c9e0ac818a9c7f132a5e43c1339ec1cbbfecb1a938bd3a47875b7c9" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:9e7b0a4ca6dcc007a4cef00a761bba2dea959de4bd2df98f926b33c92ca5dfb9" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:5d27bbe326c6b539c64b42638b18bc6003a8d88f76213a97ac9ed4f885efeab7" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-manylinux_2_26_ppc64le.manylinux_2_28_ppc64le.whl", hash = "sha256:c4e425db0c5445ef0ad56b0eec54f89b88b2d884656e536a90b2f52aecb4ca86" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:4b89b098105b8599dc57adac95d1813409ac476d3c948a498775d3d0c6124bfb" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-manylinux_2_28_i686.whl", hash = "sha256:c4a699432846df86cc3de502ee85f445ebad748a1c6021d445f3e514d2cd4b1c" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-manylinux_2_31_armv7l.whl", hash = "sha256:30e7b2ed63b6c8e97cca8af048589a788ab5c9c905f36d9cf1c2bb549f450d2f" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-manylinux_2_38_riscv64.manylinux_2_39_riscv64.whl", hash = "sha256:022981127642fe19866d2907d76241bb07ed21749601f727d5d5dd1ce5d1b773" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:23cad0cc86046d4222f7f418910e46b89971c5a45d3c8abfad0f64b7b05e4a9b" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-musllinux_1_2_armv7l.whl", hash = "sha256:21c3302068f50d1e8728c67c87ba92aa87043abee517aa2576cca1855326b405" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-musllinux_1_2_ppc64le.whl", hash = "sha256:be10838781cb3be19251e276910cd508fe127e27c3242e50521521a0f3781690" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-musllinux_1_2_riscv64.whl", hash = "sha256:2173a7bffe97667bbf0767f8a99e587740a8c56fdf3befac4b09cb29a80276fd" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:c6854e9cf99c84beb004eecd7d3a3868ef1109bf2b1df92d7bc11e96a36c2180" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-win32.whl", hash = "sha256:00750d63ef0031a05331b9223463b1c7c02b9004cef2346a5b2877f0f9494dd2" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-win_amd64.whl", hash = "sha256:80410c3a7e3c617af04de17caa9f9f20adaa817093293d69eae7d7d0522836f5" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/lxml/6.1.0/lxml-6.1.0-cp314-cp314t-win_arm64.whl", hash = "sha256:26dd9f57ee3bd41e7d35b4c98a2ffd89ed11591649f421f0ec19f67d50ec67ac" },
+]
+
+[[package]]
+name = "markdown-hero"
+version = "0.1.0"
+source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
+dependencies = [
+    { name = "markdown-it-py" },
+    { name = "mdit-py-plugins" },
+    { name = "python-docx" },
+    { name = "pyyaml" },
+]
+sdist = { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/markdown-hero/0.1.0/markdown_hero-0.1.0.tar.gz", hash = "sha256:5f8055328e8b7e14f836d46a98907487828a923bf41850c4edd37b8532b3968f" }
+wheels = [
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/markdown-hero/0.1.0/markdown_hero-0.1.0-py3-none-any.whl", hash = "sha256:dda264221400686c66aa64c7fd75ad9ba9232ad0cb6ef1de18b08c46c57f35ce" },
+]
+
+[[package]]
+name = "markdown-it-py"
+version = "4.2.0"
+source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
+dependencies = [
+    { name = "mdurl" },
+]
+sdist = { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/markdown-it-py/4.2.0/markdown_it_py-4.2.0.tar.gz", hash = "sha256:04a21681d6fbb623de53f6f364d352309d4094dd4194040a10fd51833e418d49" }
+wheels = [
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/markdown-it-py/4.2.0/markdown_it_py-4.2.0-py3-none-any.whl", hash = "sha256:9f7ebbcd14fe59494226453aed97c1070d83f8d24b6fc3a3bcf9a38092641c4a" },
+]
+
+[[package]]
+name = "mdit-py-plugins"
+version = "0.6.0"
+source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
+dependencies = [
+    { name = "markdown-it-py" },
+]
+sdist = { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/mdit-py-plugins/0.6.0/mdit_py_plugins-0.6.0.tar.gz", hash = "sha256:2436f14a7295837ac9228a36feeabda867c4abc488c8d019ad5c0bda88eee040" }
+wheels = [
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/mdit-py-plugins/0.6.0/mdit_py_plugins-0.6.0-py3-none-any.whl", hash = "sha256:f7e7a25d8b616fee99cb1e330da73451d11a8061baf39bb9663ab9ce0e005b90" },
+]
+
+[[package]]
+name = "mdurl"
+version = "0.1.2"
+source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
+sdist = { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/mdurl/0.1.2/mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba" }
+wheels = [
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/mdurl/0.1.2/mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8" },
+]
+
+[[package]]
+name = "python-docx"
+version = "1.2.0"
+source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
+dependencies = [
+    { name = "lxml" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/python-docx/1.2.0/python_docx-1.2.0.tar.gz", hash = "sha256:7bc9d7b7d8a69c9c02ca09216118c86552704edc23bac179283f2e38f86220ce" }
+wheels = [
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/python-docx/1.2.0/python_docx-1.2.0-py3-none-any.whl", hash = "sha256:3fd478f3250fbbbfd3b94fe1e985955737c145627498896a8a6bf81f4baf66c7" },
+]
+
+[[package]]
+name = "pyyaml"
+version = "6.0.3"
+source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
+sdist = { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3.tar.gz", hash = "sha256:d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f" }
+wheels = [
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:7f047e29dcae44602496db43be01ad42fc6f1cc0d8cd6c83d342306c32270196" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:fc09d0aa354569bc501d4e787133afc08552722d3ab34836a80547331bb5d4a0" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:9149cad251584d5fb4981be1ecde53a1ca46c891a79788c0df828d2f166bda28" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:5fdec68f91a0c6739b380c83b951e2c72ac0197ace422360e6d5a959d8d97b2c" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:8dc52c23056b9ddd46818a57b78404882310fb473d63f17b07d5c40421e47f8e" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:41715c910c881bc081f1e8872880d3c650acf13dfa8214bad49ed4cede7c34ea" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-win32.whl", hash = "sha256:96b533f0e99f6579b3d4d4995707cf36df9100d67e0c8303a0c55b27b5f99bc5" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-win_amd64.whl", hash = "sha256:5fcd34e47f6e0b794d17de1b4ff496c00986e1c83f7ab2fb8fcfe9616ff7477b" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp312-cp312-win_arm64.whl", hash = "sha256:64386e5e707d03a7e172c0701abfb7e10f0fb753ee1d773128192742712a98fd" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:8da9669d359f02c0b91ccc01cac4a67f16afec0dac22c2ad09f46bee0697eba8" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:2283a07e2c21a2aa78d9c4442724ec1eb15f5e42a723b99cb3d822d48f5f7ad1" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:ee2922902c45ae8ccada2c5b501ab86c36525b883eff4255313a253a3160861c" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp313-cp313-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:a33284e20b78bd4a18c8c2282d549d10bc8408a2a7ff57653c0cf0b9be0afce5" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:0f29edc409a6392443abf94b9cf89ce99889a1dd5376d94316ae5145dfedd5d6" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:f7057c9a337546edc7973c0d3ba84ddcdf0daa14533c2065749c9075001090e6" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:eda16858a3cab07b80edaf74336ece1f986ba330fdb8ee0d6c0d68fe82bc96be" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp313-cp313-win32.whl", hash = "sha256:d0eae10f8159e8fdad514efdc92d74fd8d682c933a6dd088030f3834bc8e6b26" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp313-cp313-win_amd64.whl", hash = "sha256:79005a0d97d5ddabfeeea4cf676af11e647e41d81c9a7722a193022accdb6b7c" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp313-cp313-win_arm64.whl", hash = "sha256:5498cd1645aa724a7c71c8f378eb29ebe23da2fc0d7a08071d89469bf1d2defb" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314-macosx_10_13_x86_64.whl", hash = "sha256:8d1fab6bb153a416f9aeb4b8763bc0f22a5586065f86f7664fc23339fc1c1fac" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:34d5fcd24b8445fadc33f9cf348c1047101756fd760b4dacb5c3e99755703310" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:501a031947e3a9025ed4405a168e6ef5ae3126c59f90ce0cd6f2bfc477be31b7" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:b3bc83488de33889877a0f2543ade9f70c67d66d9ebb4ac959502e12de895788" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c458b6d084f9b935061bc36216e8a69a7e293a2f1e68bf956dcd9e6cbcd143f5" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:7c6610def4f163542a622a73fb39f534f8c101d690126992300bf3207eab9764" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:5190d403f121660ce8d1d2c1bb2ef1bd05b5f68533fc5c2ea899bd15f4399b35" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314-win_amd64.whl", hash = "sha256:4a2e8cebe2ff6ab7d1050ecd59c25d4c8bd7e6f400f5f82b96557ac0abafd0ac" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314-win_arm64.whl", hash = "sha256:93dda82c9c22deb0a405ea4dc5f2d0cda384168e466364dec6255b293923b2f3" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-macosx_10_13_x86_64.whl", hash = "sha256:02893d100e99e03eda1c8fd5c441d8c60103fd175728e23e431db1b589cf5ab3" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:c1ff362665ae507275af2853520967820d9124984e0f7466736aea23d8611fba" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:6adc77889b628398debc7b65c073bcb99c4a0237b248cacaf3fe8a557563ef6c" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:a80cb027f6b349846a3bf6d73b5e95e782175e52f22108cfa17876aaeff93702" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:00c4bdeba853cc34e7dd471f16b4114f4162dc03e6b7afcc2128711f0eca823c" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:66e1674c3ef6f541c35191caae2d429b967b99e02040f5ba928632d9a7f0f065" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:16249ee61e95f858e83976573de0f5b2893b3677ba71c9dd36b9cf8be9ac6d65" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-win_amd64.whl", hash = "sha256:4ad1906908f2f5ae4e5a8ddfce73c320c2a1429ec52eafd27138b7f1cbe341c9" },
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-win_arm64.whl", hash = "sha256:ebc55a14a21cb14062aa4162f906cd962b28e2e9ea38f9b4391244cd8de4ae0b" },
+]
+
+[[package]]
+name = "typing-extensions"
+version = "4.15.0"
+source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
+sdist = { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/typing-extensions/4.15.0/typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466" }
+wheels = [
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/typing-extensions/4.15.0/typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548" },
+]
+
+[[package]]
+name = "wiki-llm"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "markdown-hero" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "markdown-hero" }]

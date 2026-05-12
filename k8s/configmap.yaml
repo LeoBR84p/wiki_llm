@@ -1,0 +1,61 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wiki-llm-config
+  namespace: wiki-llm
+data:
+  WIKI_BACKEND: "openrouter"
+  WIKI_MODEL_ID: "mistralai/mistral-7b-instruct:free"
+  WIKI_DIR: "/app/wiki"
+  CONTENT_DIR: "/app/content_new"
+  CONTENT_PROCESSED_DIR: "/app/content_processed"
+  CONTENT_ERROR_DIR: "/app/content_error"
+  LOG_DIR: "/app/logs"
+  WIKI_UI_HOST: "0.0.0.0"
+  WIKI_UI_PORT: "8080"
+---
+# PersistentVolumeClaims
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wiki-llm-wiki-pvc
+  namespace: wiki-llm
+spec:
+  accessModes: [ReadWriteMany]
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wiki-llm-content-pvc
+  namespace: wiki-llm
+spec:
+  accessModes: [ReadWriteMany]
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wiki-llm-processed-pvc
+  namespace: wiki-llm
+spec:
+  accessModes: [ReadWriteMany]
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wiki-llm-error-pvc
+  namespace: wiki-llm
+spec:
+  accessModes: [ReadWriteMany]
+  resources:
+    requests:
+      storage: 2Gi
