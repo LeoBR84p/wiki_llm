@@ -207,7 +207,7 @@ async def run_pipeline(cfg: WikiConfig, opts: PipelineOptions | None = None) -> 
         # ------------------------------------------------------------------
         if "groups" in stages and cfg.groupings:
             t_grp = progress.add_task("[groups] building grouping pages…", total=None)
-            await run_groups(cfg, docs)
+            await run_groups(cfg, docs, llm, llm_logger)
             progress.update(t_grp, description="[groups] done", total=1, completed=1)
 
         # ------------------------------------------------------------------

@@ -69,16 +69,32 @@ class TaxonomyConfig(BaseModel):
     Attributes:
         name: Human-readable taxonomy name (e.g. "Topics").
         wiki_subdir: Subdirectory under wiki_dir for taxonomy pages.
-        section_header: Markdown section heading to scan for raw terms in each page.
-        prompt_normalize: Prompt file for batch term normalization.
+        term_source: Where to extract terms from — wikilinks inside a section
+            header (``section_wikilinks``) or a frontmatter field value
+            (``metadata_field``).
+        section_header: Markdown section heading to scan for ``[[wikilinks]]``.
+            Required when term_source is ``section_wikilinks``.
+        metadata_field: Frontmatter field name whose value(s) become terms.
+            Required when term_source is ``metadata_field``.
+        prompt_normalize: Prompt file for batch LLM term normalization.
         prompt_create_page: Prompt file for generating taxonomy summary pages.
     """
 
     name: str
     wiki_subdir: str
-    section_header: str
+    term_source: Literal["section_wikilinks", "metadata_field"] = "section_wikilinks"
+    section_header: str | None = None
+    metadata_field: str | None = None
     prompt_normalize: Path
     prompt_create_page: Path
+
+    @model_validator(mode="after")
+    def _check_source_fields(self) -> "TaxonomyConfig":
+        if self.term_source == "section_wikilinks" and not self.section_header:
+            raise ValueError("section_header is required when term_source='section_wikilinks'")
+        if self.term_source == "metadata_field" and not self.metadata_field:
+            raise ValueError("metadata_field is required when term_source='metadata_field'")
+        return self
 
 
 class GroupingConfig(BaseModel):
@@ -88,11 +104,14 @@ class GroupingConfig(BaseModel):
         name: Human-readable grouping name (e.g. "Business Unit").
         wiki_subdir: Subdirectory under wiki_dir for grouping pages.
         metadata_field: The document metadata field used to group documents.
+        prompt_create_page: Optional prompt file for an LLM-generated summary
+            page.  When None, a mechanical Markdown table is produced instead.
     """
 
     name: str
     wiki_subdir: str
     metadata_field: str
+    prompt_create_page: Path | None = None
 
 
 # ---------------------------------------------------------------------------

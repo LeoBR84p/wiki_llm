@@ -11,6 +11,10 @@ import time
 import uuid
 from pathlib import Path
 
+from jinja2 import Template
+
+from ..llm.base import BaseLLMClient
+from ..llm.log import LLMLogger
 from ..models.config import GroupingConfig, WikiConfig
 from ..models.document import Document
 
@@ -110,17 +114,82 @@ def _page_content(group_name: str, field: str, docs: list[Document], grp_cfg: Gr
     return "\n".join(lines) + "\n"
 
 
-async def run_groups(cfg: WikiConfig, docs: list[Document]) -> None:
+async def _generate_group_page_llm(
+    group_name: str,
+    grp_cfg: GroupingConfig,
+    cfg: WikiConfig,
+    docs: list[Document],
+    llm: BaseLLMClient,
+    llm_logger: LLMLogger,
+) -> str:
+    """Generate a grouping summary page via LLM.
+
+    Renders the prompt template with group context, calls the LLM, and returns
+    the generated Markdown content.  Falls back to the mechanical table if the
+    LLM call fails.
+
+    Args:
+        group_name: The distinct metadata value defining this group.
+        grp_cfg: GroupingConfig providing the prompt path.
+        cfg: Active WikiConfig for language and wiki settings.
+        docs: All documents belonging to this group.
+        llm: Active LLM client.
+        llm_logger: Logger for the LLM call.
+
+    Returns:
+        Markdown content string for the grouping page.
+    """
+    system_tpl = grp_cfg.prompt_create_page.read_text(encoding="utf-8")  # type: ignore[union-attr]
+    docs_list = [
+        {"id": d.metadata.id, "title": d.metadata.title, "status": d.metadata.status}
+        for d in sorted(docs, key=lambda d: d.metadata.id)
+    ]
+    context = {
+        "group_name": group_name,
+        "field": grp_cfg.metadata_field,
+        "grouping_name": grp_cfg.name,
+        "docs": docs_list,
+        "total": len(docs),
+        "language": cfg.language,
+    }
+    system = Template(system_tpl).render(**context)
+    user = f"{grp_cfg.name}: {group_name}\nDocuments: {len(docs)}"
+
+    t0 = llm_logger.start_call()
+    try:
+        resp = await llm.call(system, user)
+        llm_logger.record(
+            system=system, user=user, output=resp.text,
+            tokens_in=resp.tokens_in, tokens_out=resp.tokens_out,
+            cached_tokens=resp.cached_tokens, model_id=resp.model_id,
+            stage="groups.create_page", elapsed=time.monotonic() - t0,
+        )
+        return resp.text
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("LLM generation for group '%s' failed: %s — using fallback table", group_name, exc)
+        return _page_content(group_name, grp_cfg.metadata_field, docs, grp_cfg)
+
+
+async def run_groups(
+    cfg: WikiConfig,
+    docs: list[Document],
+    llm: BaseLLMClient | None = None,
+    llm_logger: LLMLogger | None = None,
+) -> None:
     """Generate grouping pages for all configured GroupingConfig entries.
 
     For each grouping, partitions the provided documents by their metadata
-    field value, then writes one summary page per distinct value.  Existing
-    pages are not overwritten (incremental).  Does nothing if no groupings
-    are configured.
+    field value, then writes one summary page per distinct value.  When
+    ``grp_cfg.prompt_create_page`` is set and an LLM client is available the
+    page is generated via LLM; otherwise a mechanical Markdown table is
+    written.  Existing pages are not overwritten (incremental).  Does nothing
+    if no groupings are configured.
 
     Args:
         cfg: Active WikiConfig with wiki_dir and groupings list.
         docs: List of Documents produced by the read stage.
+        llm: Optional LLM client used for prompt-based page generation.
+        llm_logger: Optional logger for LLM calls.
     """
     if not cfg.groupings:
         return
@@ -139,6 +208,12 @@ async def run_groups(cfg: WikiConfig, docs: list[Document]) -> None:
             dest = grp_dir / f"{slug}.md"
             if dest.exists():
                 continue
-            content = _page_content(group_name, grp_cfg.metadata_field, group_docs, grp_cfg)
+            use_llm = grp_cfg.prompt_create_page is not None and llm is not None and llm_logger is not None
+            if use_llm:
+                content = await _generate_group_page_llm(
+                    group_name, grp_cfg, cfg, group_docs, llm, llm_logger  # type: ignore[arg-type]
+                )
+            else:
+                content = _page_content(group_name, grp_cfg.metadata_field, group_docs, grp_cfg)
             _write_atomic(dest, content)
             logger.info("  Grouping page generated: %s", dest.name)

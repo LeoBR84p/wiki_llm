@@ -60,8 +60,8 @@ def _section_pattern(header: str) -> re.Pattern:
     )
 
 
-def collect_terms(wiki_dir: Path, tax_cfg: TaxonomyConfig) -> dict[str, list[str]]:
-    """Scan wiki_dir and return a mapping of raw terms to the page IDs that mention them.
+def _collect_terms_from_sections(wiki_dir: Path, tax_cfg: TaxonomyConfig) -> dict[str, list[str]]:
+    """Collect terms by scanning ``[[wikilinks]]`` inside a named Markdown section.
 
     Walks every non-system Markdown file under wiki_dir, extracts the section
     matching ``tax_cfg.section_header``, and collects all ``[[wikilinks]]``
@@ -76,7 +76,7 @@ def collect_terms(wiki_dir: Path, tax_cfg: TaxonomyConfig) -> dict[str, list[str
         A dict mapping each raw term string to a list of page IDs (stems) that
         contain it under the configured section.
     """
-    pattern = _section_pattern(tax_cfg.section_header)
+    pattern = _section_pattern(tax_cfg.section_header)  # type: ignore[arg-type]
     terms: dict[str, list[str]] = {}
 
     for md_file in wiki_dir.rglob("*.md"):
@@ -99,6 +99,94 @@ def collect_terms(wiki_dir: Path, tax_cfg: TaxonomyConfig) -> dict[str, list[str
                     terms[t].append(page_id)
 
     return terms
+
+
+_RE_FM_SCALAR = re.compile(r"^(?P<key>[A-Za-z_][A-Za-z0-9_]*):\s*(?P<val>.+)$")
+_RE_FM_LIST_ITEM = re.compile(r"^\s+-\s+(?P<val>.+)$")
+
+
+def _collect_terms_from_frontmatter(wiki_dir: Path, tax_cfg: TaxonomyConfig) -> dict[str, list[str]]:
+    """Collect terms from a frontmatter field in every wiki page.
+
+    Parses the YAML frontmatter of each non-system Markdown file and extracts
+    the value(s) of ``tax_cfg.metadata_field``.  Both scalar strings and YAML
+    list values are supported.  The taxonomy subdirectory itself is excluded.
+
+    Args:
+        wiki_dir: Root wiki directory to scan.
+        tax_cfg: Taxonomy configuration providing the metadata_field and wiki_subdir.
+
+    Returns:
+        A dict mapping each term string to a list of page IDs (stems) that
+        carry that value in their frontmatter.
+    """
+    field = tax_cfg.metadata_field  # type: ignore[assignment]
+    terms: dict[str, list[str]] = {}
+
+    for md_file in wiki_dir.rglob("*.md"):
+        if md_file.name in _SYSTEM_PAGES:
+            continue
+        if tax_cfg.wiki_subdir in md_file.parts:
+            continue
+        text = md_file.read_text(encoding="utf-8")
+        if not text.startswith("---"):
+            continue
+        end = text.find("\n---", 3)
+        if end == -1:
+            continue
+        fm_text = text[4:end]
+        page_id = md_file.stem
+
+        # Walk frontmatter lines to find the target field, supporting lists
+        in_target = False
+        collected: list[str] = []
+        for line in fm_text.splitlines():
+            list_m = _RE_FM_LIST_ITEM.match(line) if in_target else None
+            if list_m:
+                val = list_m.group("val").strip().strip("\"'")
+                if val:
+                    collected.append(val)
+                continue
+            scalar_m = _RE_FM_SCALAR.match(line)
+            if scalar_m:
+                in_target = scalar_m.group("key") == field
+                if in_target:
+                    val = scalar_m.group("val").strip().strip("\"'")
+                    # Inline list: "field: [a, b, c]"
+                    if val.startswith("[") and val.endswith("]"):
+                        for item in val[1:-1].split(","):
+                            v = item.strip().strip("\"'")
+                            if v:
+                                collected.append(v)
+                        in_target = False
+                    elif val:
+                        collected.append(val)
+                        in_target = False
+
+        for term in collected:
+            terms.setdefault(term, [])
+            if page_id not in terms[term]:
+                terms[term].append(page_id)
+
+    return terms
+
+
+def collect_terms(wiki_dir: Path, tax_cfg: TaxonomyConfig) -> dict[str, list[str]]:
+    """Dispatch term collection based on ``tax_cfg.term_source``.
+
+    Routes to ``_collect_terms_from_sections`` for ``section_wikilinks`` or
+    ``_collect_terms_from_frontmatter`` for ``metadata_field``.
+
+    Args:
+        wiki_dir: Root wiki directory to scan.
+        tax_cfg: Taxonomy configuration.
+
+    Returns:
+        A dict mapping each raw term string to a list of page IDs.
+    """
+    if tax_cfg.term_source == "metadata_field":
+        return _collect_terms_from_frontmatter(wiki_dir, tax_cfg)
+    return _collect_terms_from_sections(wiki_dir, tax_cfg)
 
 
 async def normalize_terms(

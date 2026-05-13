@@ -323,3 +323,17 @@ def chat(
 
     cfg, _ = _get_opts([])
     start_ui(cfg, host=host, port=port)
+
+
+@app.command()
+def setup() -> None:
+    """Run the interactive setup wizard.
+
+    Guides you through configuring WikiConfig, entity types, taxonomies, and
+    groupings.  Generates config/my_wiki.py (with backup) and a .env template
+    with all required variable labels.  LLM-based prompt generation is offered
+    when credentials are already present; otherwise example templates are
+    copied and the .env template points you to the right keys to fill in.
+    """
+    from .setup_wizard import run_wizard  # noqa: PLC0415
+    run_wizard()

@@ -1783,6 +1783,18 @@ wheels = [
 ]
 
 [[package]]
+name = "prompt-toolkit"
+version = "3.0.52"
+source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
+dependencies = [
+    { name = "wcwidth" },
+]
+sdist = { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/prompt-toolkit/3.0.52/prompt_toolkit-3.0.52.tar.gz", hash = "sha256:28cde192929c8e7321de85de1ddbe736f1375148b02f2e17edd840042b1be855" }
+wheels = [
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/prompt-toolkit/3.0.52/prompt_toolkit-3.0.52-py3-none-any.whl", hash = "sha256:9aac639a3bbd33284347de5ad8d68ecc044b91a762dc39b7c21095fcd6a19955" },
+]
+
+[[package]]
 name = "propcache"
 version = "0.5.2"
 source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
@@ -2169,6 +2181,18 @@ wheels = [
     { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:16249ee61e95f858e83976573de0f5b2893b3677ba71c9dd36b9cf8be9ac6d65" },
     { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-win_amd64.whl", hash = "sha256:4ad1906908f2f5ae4e5a8ddfce73c320c2a1429ec52eafd27138b7f1cbe341c9" },
     { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/pyyaml/6.0.3/pyyaml-6.0.3-cp314-cp314t-win_arm64.whl", hash = "sha256:ebc55a14a21cb14062aa4162f906cd962b28e2e9ea38f9b4391244cd8de4ae0b" },
+]
+
+[[package]]
+name = "questionary"
+version = "2.1.1"
+source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
+dependencies = [
+    { name = "prompt-toolkit" },
+]
+sdist = { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/questionary/2.1.1/questionary-2.1.1.tar.gz", hash = "sha256:3d7e980292bb0107abaa79c68dd3eee3c561b83a0f89ae482860b181c8bd412d" }
+wheels = [
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/questionary/2.1.1/questionary-2.1.1-py3-none-any.whl", hash = "sha256:a51af13f345f1cdea62347589fbb6df3b290306ab8930713bfae4d475a7d4a59" },
 ]
 
 [[package]]
@@ -2735,6 +2759,15 @@ wheels = [
 ]
 
 [[package]]
+name = "wcwidth"
+version = "0.7.0"
+source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
+sdist = { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/wcwidth/0.7.0/wcwidth-0.7.0.tar.gz", hash = "sha256:90e3a7ea092341c44b99562e75d09e4d5160fe7a3974c6fb842a101a95e7eed0" }
+wheels = [
+    { url = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/packages/wcwidth/0.7.0/wcwidth-0.7.0-py3-none-any.whl", hash = "sha256:5d69154c429a82910e241c738cd0e2976fac8a2dd47a1a805f4afed1c0f136f2" },
+]
+
+[[package]]
 name = "webencodings"
 version = "0.5.1"
 source = { registry = "http://nexus.bndes.net:8180/nexus/repository/pypi-proxy/simple" }
@@ -2807,6 +2840,7 @@ dependencies = [
     { name = "openai" },
     { name = "pydantic" },
     { name = "python-dotenv" },
+    { name = "questionary" },
     { name = "rank-bm25" },
     { name = "rich" },
     { name = "tqdm" },
@@ -2829,6 +2863,7 @@ requires-dist = [
     { name = "openai", specifier = ">=1.0" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
+    { name = "questionary", specifier = ">=2.1.1" },
     { name = "rank-bm25", specifier = ">=0.2" },
     { name = "rich", specifier = ">=14.3.4" },
     { name = "tqdm", specifier = ">=4.0" },
