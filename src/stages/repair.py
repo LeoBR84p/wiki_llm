@@ -309,7 +309,7 @@ async def _repair_orphan(
     """
     path = _find_page(wiki_dir, target)
     if path is None:
-        return [], [f"orphan:{target}:arquivo não encontrado"]
+        return [], [f"orphan:{target}:file not found"]
 
     # List all page ids as candidates
     candidate_ids = [p.stem for p in wiki_dir.rglob("*.md") if p.name not in _SYSTEM_PAGES and p.stem != target]
@@ -317,9 +317,9 @@ async def _repair_orphan(
 
     system = cfg.prompt_lint.read_text(encoding="utf-8")
     user = (
-        f"Página órfã: **[[{target}]]**\n\n"
-        f"Conteúdo (primeiros 500 chars):\n{path.read_text(encoding='utf-8')[:500]}\n\n"
-        f"Páginas que poderiam referenciar esta:\n{candidates_text}"
+        f"Orphan page: **[[{target}]]**\n\n"
+        f"Content (first 500 chars):\n{path.read_text(encoding='utf-8')[:500]}\n\n"
+        f"Pages that could reference this one:\n{candidates_text}"
     )
 
     t0 = llm_logger.start_call()
@@ -374,7 +374,7 @@ async def run_repair(
         from langgraph.graph import StateGraph, END  # noqa: PLC0415
         from langgraph.constants import Send  # noqa: PLC0415
     except ImportError:
-        logger.warning("langgraph não instalado — reparo automático desativado")
+        logger.warning("langgraph not installed — automatic repair disabled")
         return repair_state
 
     wiki_dir = repair_state.wiki_dir
@@ -410,5 +410,5 @@ async def run_repair(
     final = await graph.ainvoke(initial_state)
     repair_state.repaired = final.get("repaired", [])
     repair_state.errors = final.get("errors", [])
-    logger.info("Reparo: %d reparados, %d erros", len(repair_state.repaired), len(repair_state.errors))
+    logger.info("Repair: %d repaired, %d errors", len(repair_state.repaired), len(repair_state.errors))
     return repair_state

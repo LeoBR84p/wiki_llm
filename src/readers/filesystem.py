@@ -97,7 +97,7 @@ def _extract_md(raw: str, path: Path, cfg: WikiConfig, default_slug: str) -> Doc
     clean = md_strip(body)
     doc_id = _content_uuid(clean)
 
-    # Campos descritivos: lidos do frontmatter, fallback para nome do arquivo
+    # Descriptive fields: read from frontmatter, fallback to filename
     title = str(meta.get("title") or meta.get("titulo") or _humanize(path.stem))
     entity_type = str(meta.get("entity_type") or default_slug)
     status = str(meta.get("status") or "")
@@ -115,7 +115,7 @@ def _extract_md(raw: str, path: Path, cfg: WikiConfig, default_slug: str) -> Doc
             status=status,
             extra=extra,
         ),
-        content=body.strip(),   # conteúdo original preservado para a raw page
+        content=body.strip(),   # original content preserved for the raw page
         content_path=path,
     )
 
@@ -156,19 +156,19 @@ def _read_file_sync(path: Path, cfg: WikiConfig) -> Document | None:
                 result = md_converter.convert(str(path))
                 raw = result.text_content or ""
             except ImportError:
-                logger.warning("markitdown não instalado — ignorando %s", path.name)
+                logger.warning("markitdown not installed — skipping %s", path.name)
                 return None
             return _extract_md(raw, path, cfg, default_slug)
 
         elif suffix == ".pdf":
             if cfg.pdf_reader is None:
-                logger.warning("pdf_reader não configurado — ignorando %s", path.name)
+                logger.warning("pdf_reader not configured — skipping %s", path.name)
                 return None
             raw = cfg.pdf_reader.extract_text(path)
             return _extract_md(raw, path, cfg, default_slug)
 
     except Exception as exc:  # noqa: BLE001
-        logger.error("Erro ao ler %s: %s", path, exc)
+        logger.error("Error reading %s: %s", path, exc)
         return None
 
     return None
@@ -204,7 +204,7 @@ class FilesystemReader:
         """
         content_dir = self._cfg.content_dir
         if not content_dir.exists():
-            logger.warning("content_dir não existe: %s", content_dir)
+            logger.warning("content_dir does not exist: %s", content_dir)
             return []
 
         paths = [p for p in content_dir.rglob("*") if p.is_file() and p.suffix.lower() in _SUPPORTED]
@@ -215,5 +215,5 @@ class FilesystemReader:
             if doc is not None:
                 docs.append(doc)
 
-        logger.info("FilesystemReader: %d documentos carregados de %s", len(docs), content_dir)
+        logger.info("FilesystemReader: %d documents loaded from %s", len(docs), content_dir)
         return docs

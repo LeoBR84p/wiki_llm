@@ -141,7 +141,7 @@ async def run_lint(
     result = static_analysis(cfg.wiki_dir)
     orphans: list[str] = result["orphans"]
     broken_links: list[dict[str, str]] = result["broken_links"]
-    logger.info("Lint estático: %d órfãs, %d links quebrados", len(orphans), len(broken_links))
+    logger.info("Static lint: %d orphans, %d broken links", len(orphans), len(broken_links))
 
     # --- markdown_hero lint ---
     mh_issues: list[str] = []
@@ -153,15 +153,15 @@ async def run_lint(
                 for issue in issues:
                     mh_issues.append(f"{pid}: {issue}")
         except Exception as exc:  # noqa: BLE001
-            logger.debug("mh_lint falhou em %s: %s", pid, exc)
+            logger.debug("mh_lint failed for %s: %s", pid, exc)
 
     # --- LLM semantic lint ---
     system = cfg.prompt_lint.read_text(encoding="utf-8")
     stats = result["stats"]
     context_lines = [
-        f"**Total páginas:** {stats['total_paginas']}",
+        f"**Total pages:** {stats['total_paginas']}",
         f"**Total links:** {stats['total_links']}",
-        f"**Páginas órfãs ({len(orphans)}):** {', '.join(orphans[:30])}",
+        f"**Orphan pages ({len(orphans)}):** {', '.join(orphans[:30])}",
         f"**Links quebrados ({len(broken_links)}):** "
         + ", ".join(f"{b['origem']}→{b['destino']}" for b in broken_links[:20]),
     ]
@@ -181,7 +181,7 @@ async def run_lint(
             stage="lint.semantic", elapsed=time.monotonic() - t0,
         )
     except Exception as exc:  # noqa: BLE001
-        logger.error("LLM lint falhou: %s", exc)
+        logger.error("LLM lint failed: %s", exc)
 
     # --- Write report ---
     report_lines = [
@@ -189,36 +189,36 @@ async def run_lint(
         "tipo: lint_report",
         "---",
         "",
-        "# Relatório de Lint",
+        "# Lint Report",
         "",
-        f"## Estatísticas",
-        f"- Total páginas: {stats['total_paginas']}",
+        "## Statistics",
+        f"- Total pages: {stats['total_paginas']}",
         f"- Total links: {stats['total_links']}",
-        f"- Páginas órfãs: {len(orphans)}",
-        f"- Links quebrados: {len(broken_links)}",
+        f"- Orphan pages: {len(orphans)}",
+        f"- Broken links: {len(broken_links)}",
         "",
-        "## Páginas Órfãs",
+        "## Orphan Pages",
         "",
     ]
     for o in orphans:
         report_lines.append(f"- [[{o}]]")
     report_lines += [
         "",
-        "## Links Quebrados",
+        "## Broken Links",
         "",
     ]
     for b in broken_links:
         report_lines.append(f"- [[{b['origem']}]] → `{b['destino']}`")
     report_lines += [
         "",
-        "## Avaliação Semântica (LLM)",
+        "## Semantic Evaluation (LLM)",
         "",
-        llm_report or "_Sem avaliação LLM._",
+        llm_report or "_No LLM evaluation._",
     ]
 
     report_path = cfg.wiki_dir / "lint_report.md"
     report_path.write_text("\n".join(report_lines), encoding="utf-8")
-    logger.info("Lint report: %s", report_path)
+    logger.info("Lint report written: %s", report_path)
 
     return RepairState(
         wiki_dir=cfg.wiki_dir,

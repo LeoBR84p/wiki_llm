@@ -49,7 +49,7 @@ async def run_index(cfg: WikiConfig) -> None:
         "tipo: indice",
         "---",
         "",
-        "# Índice da Wiki",
+        "# Wiki Index",
         "",
     ]
 
@@ -92,4 +92,4 @@ async def run_index(cfg: WikiConfig) -> None:
     dest = cfg.wiki_dir / "index.md"
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text("\n".join(lines), encoding="utf-8")
-    logger.info("Índice gerado: %s", dest)
+    logger.info("Index generated: %s", dest)

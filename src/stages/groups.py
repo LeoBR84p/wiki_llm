@@ -89,19 +89,19 @@ def _page_content(group_name: str, field: str, docs: list[Document], grp_cfg: Gr
     links = ", ".join(f"[[{d.metadata.id}]]" for d in sorted(docs, key=lambda d: d.metadata.id))
     lines = [
         "---",
-        f'tipo: agrupamento',
-        f'campo: {field}',
-        f'valor: "{group_name}"',
+        f'tipo: grouping',
+        f'field: {field}',
+        f'value: "{group_name}"',
         f"total: {len(docs)}",
         "---",
         "",
         f"# {grp_cfg.name}: {group_name}",
         "",
-        f"Reúne **{len(docs)}** documento(s) com `{field} = {group_name}`.",
+        f"Groups **{len(docs)}** document(s) with `{field} = {group_name}`.",
         "",
-        "## Documentos",
+        "## Documents",
         "",
-        "| id | título | status |",
+        "| id | title | status |",
         "|---|---|---|",
     ]
     for d in sorted(docs, key=lambda d: d.metadata.id):
@@ -126,7 +126,7 @@ async def run_groups(cfg: WikiConfig, docs: list[Document]) -> None:
         return
 
     for grp_cfg in cfg.groupings:
-        logger.info("Agrupamento: %s (campo: %s)", grp_cfg.name, grp_cfg.metadata_field)
+        logger.info("Grouping: %s (field: %s)", grp_cfg.name, grp_cfg.metadata_field)
         groups: dict[str, list[Document]] = {}
         for doc in docs:
             val = _group_value(doc, grp_cfg.metadata_field)
@@ -141,4 +141,4 @@ async def run_groups(cfg: WikiConfig, docs: list[Document]) -> None:
                 continue
             content = _page_content(group_name, grp_cfg.metadata_field, group_docs, grp_cfg)
             _write_atomic(dest, content)
-            logger.info("  Agrupamento gerado: %s", dest.name)
+            logger.info("  Grouping page generated: %s", dest.name)

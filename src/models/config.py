@@ -135,7 +135,7 @@ class WikiConfig(BaseModel):
     # LLM
     llm: LLMConfig
 
-    # Conteúdo — o usuário define livremente quantos tipos, taxonomias e agrupamentos
+    # Content — freely define any number of entity types, taxonomies, and groupings
     entity_types: list[EntityTypeConfig]
     taxonomies: list[TaxonomyConfig] = Field(default_factory=list)
     groupings: list[GroupingConfig] = Field(default_factory=list)
@@ -155,11 +155,11 @@ class WikiConfig(BaseModel):
 
     # Fonte de dados
     content_dir: Path = Path("content_new")
-    # Destinos pós-processamento (None = derivado automaticamente de content_dir.parent)
+    # Post-processing destinations (None = derived automatically from content_dir.parent)
     content_processed_dir: Path | None = None
     content_error_dir: Path | None = None
 
-    # PDF reader plugável — deve implementar PdfReaderProtocol
+    # Pluggable PDF reader — must implement PdfReaderProtocol
     pdf_reader: Any | None = None
 
     def get_processed_dir(self) -> Path:
@@ -183,10 +183,10 @@ class WikiConfig(BaseModel):
     @model_validator(mode="after")
     def _check_entity_types(self) -> WikiConfig:
         if not self.entity_types:
-            raise ValueError("entity_types não pode ser vazio.")
+            raise ValueError("entity_types cannot be empty.")
         slugs = [e.slug for e in self.entity_types]
         if len(slugs) != len(set(slugs)):
-            raise ValueError("Slugs de entity_types devem ser únicos.")
+            raise ValueError("entity_types slugs must be unique.")
         return self
 
     def entity_type_by_slug(self, slug: str) -> EntityTypeConfig | None:

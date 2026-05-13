@@ -153,7 +153,7 @@ async def normalize_terms(
                 for n in batch:
                     mapping[n] = n
         except Exception as exc:  # noqa: BLE001
-            logger.warning("normalize_terms lote %d falhou: %s — usando identity", i, exc)
+            logger.warning("normalize_terms batch %d failed: %s — using identity", i, exc)
             for n in batch:
                 mapping[n] = n
 
@@ -210,7 +210,7 @@ async def generate_taxonomy_pages(
         slug = _safe_slug(norm_term)
         dest = tax_dir / f"{slug}.md"
         if dest.exists():
-            continue  # incremental: não sobrescreve
+            continue  # incremental: do not overwrite
 
         links = ", ".join(f"[[{pid}]]" for pid in sorted(page_ids))
         context = {
@@ -220,7 +220,7 @@ async def generate_taxonomy_pages(
             "taxonomy": tax_cfg.name,
         }
         system = Template(system_tpl).render(**context)
-        user = f"Termo: {norm_term}\nPáginas: {links}"
+        user = f"Term: {norm_term}\nPages: {links}"
 
         t0 = llm_logger.start_call()
         try:
@@ -232,9 +232,9 @@ async def generate_taxonomy_pages(
                 stage="taxonomy.create_page", elapsed=_time.monotonic() - t0,
             )
             _write_atomic(dest, resp.text)
-            logger.info("Taxonomia gerada: %s", dest)
+            logger.info("Taxonomy page generated: %s", dest)
         except Exception as exc:  # noqa: BLE001
-            logger.error("Erro ao gerar página de taxonomia '%s': %s", norm_term, exc)
+            logger.error("Error generating taxonomy page '%s': %s", norm_term, exc)
 
 
 async def run_taxonomy(
@@ -254,11 +254,11 @@ async def run_taxonomy(
         llm_logger: Logger for all LLM calls made during this stage.
     """
     if not cfg.taxonomies:
-        logger.info("Nenhuma taxonomia configurada.")
+        logger.info("No taxonomies configured.")
         return
     for tax_cfg in cfg.taxonomies:
-        logger.info("Taxonomia: %s", tax_cfg.name)
+        logger.info("Taxonomy: %s", tax_cfg.name)
         terms = collect_terms(cfg.wiki_dir, tax_cfg)
-        logger.info("  %d termos brutos coletados", len(terms))
+        logger.info("  %d raw terms collected", len(terms))
         mapping = await normalize_terms(terms, tax_cfg, cfg, llm, llm_logger)
         await generate_taxonomy_pages(terms, mapping, tax_cfg, cfg, llm, llm_logger)

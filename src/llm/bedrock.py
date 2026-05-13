@@ -118,7 +118,7 @@ def _sync_call(client: Any, model_id: str, temperature: float, max_tokens: int,
             last_exc = exc
             if attempt < max_attempts:
                 time.sleep(0.5 * (2 ** attempt))
-    raise RuntimeError(f"Bedrock falhou após {max_attempts} tentativas") from last_exc
+    raise RuntimeError(f"Bedrock failed after {max_attempts} attempts") from last_exc
 
 
 class BedrockClient:

@@ -113,23 +113,23 @@ async def run_pipeline(cfg: WikiConfig, opts: PipelineOptions | None = None) -> 
     # ------------------------------------------------------------------
     docs: list[Document] = []
     if "read" in stages:
-        logger.info("=== [read] Lendo documentos de %s", cfg.content_dir)
+        logger.info("=== [read] Reading documents from %s", cfg.content_dir)
         reader = FilesystemReader(cfg)
         docs = await reader.read_all()
         result.docs_read = len(docs)
-        logger.info("  %d documentos lidos", result.docs_read)
+        logger.info("  %d documents read", result.docs_read)
 
         # Apply status_filter
         if cfg.status_filter:
             before = len(docs)
             docs = [d for d in docs if d.metadata.status in cfg.status_filter or not d.metadata.status]
-            logger.info("  status_filter: %d → %d documentos", before, len(docs))
+            logger.info("  status_filter: %d → %d documents", before, len(docs))
 
     # ------------------------------------------------------------------
     # 2. Generate
     # ------------------------------------------------------------------
     if "generate" in stages and docs:
-        logger.info("=== [generate] Gerando %d páginas (workers=%d)", len(docs), opts.workers)
+        logger.info("=== [generate] Generating %d pages (workers=%d)", len(docs), opts.workers)
         semaphore = asyncio.Semaphore(opts.workers)
         cfg.wiki_dir.mkdir(parents=True, exist_ok=True)
         processed_dir = cfg.get_processed_dir()
@@ -140,7 +140,7 @@ async def run_pipeline(cfg: WikiConfig, opts: PipelineOptions | None = None) -> 
                 try:
                     page = await generate_page(doc, cfg, llm, llm_logger, force=opts.force)
                 except Exception as exc:  # noqa: BLE001
-                    logger.error("generate exception para %s: %s", doc.metadata.id, exc)
+                    logger.error("generate exception for %s: %s", doc.metadata.id, exc)
                     page = None
                 return doc, page
 
@@ -149,9 +149,9 @@ async def run_pipeline(cfg: WikiConfig, opts: PipelineOptions | None = None) -> 
 
         for r in pair_results:
             if isinstance(r, Exception):
-                # Erro inesperado no próprio _gen_one (raro)
+                # Unexpected error inside _gen_one (rare)
                 result.pages_error += 1
-                logger.error("generate exception inesperado: %s", r)
+                logger.error("generate unexpected exception: %s", r)
                 continue
             doc, page = r
             if page is None:
@@ -214,7 +214,7 @@ async def run_pipeline(cfg: WikiConfig, opts: PipelineOptions | None = None) -> 
 
     result.elapsed_s = time.monotonic() - t_start
     logger.info(
-        "Pipeline concluído em %.1fs | lidos=%d gerados=%d erros=%d",
+        "Pipeline complete in %.1fs | read=%d generated=%d errors=%d",
         result.elapsed_s, result.docs_read, result.pages_generated, result.pages_error,
     )
     return result
@@ -241,10 +241,10 @@ def _export_word(cfg: WikiConfig) -> None:
                 try:
                     word_format(md_file.read_text(encoding="utf-8"), str(docx_path))
                 except Exception as exc:  # noqa: BLE001
-                    logger.warning("word_format falhou em %s: %s", md_file.name, exc)
-        logger.info("Exportação Word concluída: %s", out_dir)
+                    logger.warning("word_format failed for %s: %s", md_file.name, exc)
+        logger.info("Word export complete: %s", out_dir)
     except ImportError:
-        logger.warning("markdown_hero.word_format não disponível — export_word ignorado")
+        logger.warning("markdown_hero.word_format not available — export_word skipped")
 
 
 def _move_source(source: Path, dest_dir: Path) -> None:
@@ -266,6 +266,6 @@ def _move_source(source: Path, dest_dir: Path) -> None:
             h = hashlib.sha1(str(source).encode()).hexdigest()[:6]
             dest = dest_dir / f"{source.stem}_{h}{source.suffix}"
         shutil.move(str(source), dest)
-        logger.debug("Movido: %s → %s", source.name, dest_dir.name)
+        logger.debug("Moved: %s → %s", source.name, dest_dir.name)
     except Exception as exc:  # noqa: BLE001
-        logger.warning("Não foi possível mover %s: %s", source, exc)
+        logger.warning("Could not move %s: %s", source, exc)

@@ -37,11 +37,11 @@ class OpenRouterClient:
         self._cfg = config
         api_key = os.environ.get("OPENROUTER_APIKEY", "").strip()
         if not api_key:
-            raise RuntimeError("OPENROUTER_APIKEY ausente no .env.")
+            raise RuntimeError("OPENROUTER_APIKEY not set in environment.")
         base_url = os.environ.get(
             "OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"
         )
-        self._client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+        self._client = AsyncOpenAI(api_key=api_key, base_url=base_url, timeout=120.0)
         self._instructor = instructor.from_openai(self._client, mode=instructor.Mode.JSON)
 
     async def call(self, system: str, user: str) -> LLMResponse:

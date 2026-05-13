@@ -38,7 +38,7 @@ load_dotenv()
 _ROOT = Path(__file__).parent.parent  # c:\projetos\wiki_llm
 
 # Reutiliza prompts do EXAMPLE/ — copie-os para config/prompts/ para personalizar
-_PROMPTS = _ROOT / "EXAMPLE" / "wiki_ng" / "prompts"
+_PROMPTS = _ROOT / "config" / "prompts"
 
 # Destino da wiki gerada
 WIKI_DIR = Path(os.environ.get("WIKI_DIR", str(_ROOT / "wiki")))
@@ -50,7 +50,7 @@ CONTENT_DIR = Path(os.environ.get("CONTENT_DIR", str(_ROOT / "content_new")))
 # ---------------------------------------------------------------------------
 
 _BACKEND = os.environ.get("WIKI_BACKEND", "openrouter")
-_MODEL_ID = os.environ.get("WIKI_MODEL_ID", "mistralai/mistral-7b-instruct:free")
+_MODEL_ID = os.environ.get("WIKI_MODEL_ID", "google/gemma-4-26b-a4b-it:free")
 
 llm_cfg = LLMConfig(
     backend=_BACKEND,  # type: ignore[arg-type]

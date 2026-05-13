@@ -37,7 +37,7 @@ def start_ui(cfg: WikiConfig, *, host: str = "0.0.0.0", port: int = 8080) -> Non
     try:
         from nicegui import app as ng_app, ui  # noqa: PLC0415
     except ImportError as exc:
-        raise RuntimeError("nicegui não instalado. Execute: pip install nicegui") from exc
+        raise RuntimeError("nicegui not installed. Run: pip install nicegui") from exc
 
     llm = create_client(cfg.llm)
     engine = ChatEngine(cfg)
@@ -61,7 +61,7 @@ def start_ui(cfg: WikiConfig, *, host: str = "0.0.0.0", port: int = 8080) -> Non
                 input_box.value = ""
                 with messages_container:
                     with ui.card().classes("w-full bg-blue-1"):
-                        ui.label(f"Você: {question}").classes("text-body1")
+                        ui.label(f"You: {question}").classes("text-body1")
                     thinking = ui.label("...pensando...").classes("text-grey")
 
                 try:
@@ -75,12 +75,12 @@ def start_ui(cfg: WikiConfig, *, host: str = "0.0.0.0", port: int = 8080) -> Non
                         ui.markdown(answer).classes("text-body1")
 
             with ui.row().classes("w-full"):
-                input_box = ui.input(placeholder="Faça uma pergunta sobre a wiki...").classes("flex-1")
+                input_box = ui.input(placeholder="Ask a question about the wiki...").classes("flex-1")
                 input_box.on("keydown.enter", send_message)
                 ui.button("Enviar", on_click=send_message).props("color=primary")
 
             with ui.row():
-                ui.button("Limpar histórico", on_click=lambda: (engine.clear_history(), messages_container.clear()))
+                ui.button("Clear history", on_click=lambda: (engine.clear_history(), messages_container.clear()))
 
     effective_host = os.environ.get("WIKI_UI_HOST", host)
     effective_port = int(os.environ.get("WIKI_UI_PORT", port))

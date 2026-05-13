@@ -23,7 +23,7 @@ class PageEvaluation(BaseModel):
         problems: List of specific problems found in the draft.
         suggestions: List of improvement suggestions for the editor.
     """
-    approved: bool = Field(description="True se o rascunho está adequado para publicação")
+    approved: bool = Field(description="True if the draft is suitable for publication")
     problems: list[str] = Field(default_factory=list)
     suggestions: list[str] = Field(default_factory=list)
 

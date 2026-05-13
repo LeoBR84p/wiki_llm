@@ -163,18 +163,18 @@ def _write_raw_page(doc: Document, entity_cfg: EntityTypeConfig, wiki_dir: Path,
         f'id: "{_raw_id(doc.metadata.id)}"',
         f'title: "{doc.metadata.title.replace(chr(34), chr(39))} (original)"',
         f"entity_type: {entity_cfg.slug}",
-        "tipo: raw",
+        "type: raw",
         f'source_file: "{source_name}"',
         f'content_sha256: "{sha256}"',
         f"generated_at: {generated_at}",
         "---",
         "",
-        f"# {doc.metadata.title} — Conteúdo Original",
+        f"# {doc.metadata.title} — Original Content",
         "",
-        f"> **Arquivo fonte:** `{source_name}`",
-        f"> **UUID de conteúdo:** `{doc.metadata.id}`",
+        f"> **Source file:** `{source_name}`",
+        f"> **Content UUID:** `{doc.metadata.id}`",
         f"> **SHA-256:** `{sha256}`",
-        f"> **Gerado em:** {generated_at}",
+        f"> **Generated at:** {generated_at}",
         "",
         "---",
         "",
@@ -310,7 +310,7 @@ async def _evaluate_draft(
         )
         return result
     except Exception as exc:  # noqa: BLE001
-        logger.warning("Evaluator falhou para %s (%s) — aprovando automaticamente", doc.metadata.id, exc)
+        logger.warning("Evaluator failed for %s (%s) — auto-approving", doc.metadata.id, exc)
         llm_logger.record(
             system=system, user=user, output="", tokens_in=None, tokens_out=None,
             cached_tokens=None, model_id=cfg.llm.model_id,
@@ -336,7 +336,7 @@ async def _edit_draft(
         "suggestions": suggestions,
     }
     system = _render_prompt(cfg.prompt_editor, context)
-    user = f"**Problemas:**\n{problems}\n\n**Sugestões:**\n{suggestions}\n\n**Rascunho:**\n{draft}"
+    user = f"**Problems:**\n{problems}\n\n**Suggestions:**\n{suggestions}\n\n**Draft:**\n{draft}"
 
     t0 = llm_logger.start_call()
     resp = await llm.call(system, user)
@@ -383,14 +383,14 @@ async def generate_page(
         # Tenta o primeiro tipo como fallback
         entity_cfg = cfg.entity_types[0]
         logger.warning(
-            "entity_type '%s' desconhecido para %s — usando '%s'",
+            "entity_type '%s' unknown for %s — using '%s'",
             doc.metadata.entity_type, doc.metadata.id, entity_cfg.slug,
         )
 
     dest = cfg.wiki_dir / entity_cfg.wiki_subdir / f"{_safe_filename(doc.metadata.id)}.md"
 
     if dest.exists() and not force:
-        logger.debug("Incremental: pulando %s (já existe)", dest.name)
+        logger.debug("Incremental: skipping %s (already exists)", dest.name)
         return dest
 
     generated_at = datetime.now(UTC).isoformat()
@@ -405,24 +405,24 @@ async def generate_page(
             if round_n < entity_cfg.max_rounds:
                 draft = await _edit_draft(draft, evaluation, doc, cfg, llm, llm_logger)
 
-        # Grava conteúdo original antes da página wiki
+        # Write original content before the wiki page
         _write_raw_page(doc, entity_cfg, cfg.wiki_dir, generated_at)
 
         raw_link = f"[[{_raw_id(doc.metadata.id)}]]"
         source_section = (
             "\n\n---\n\n"
-            "## Documento Original\n\n"
-            f"> Conteúdo integral do documento fonte: {raw_link}\n"
+            "## Original Document\n\n"
+            f"> Full content of the source document: {raw_link}\n"
         )
 
         frontmatter = _build_frontmatter(doc, entity_cfg, generated_at)
         full_page = frontmatter + "\n" + draft.strip() + source_section
         _write_atomic(dest, full_page)
-        logger.info("Gerado: %s", dest)
+        logger.info("Generated: %s", dest)
         return dest
 
     except Exception as exc:  # noqa: BLE001
         if cfg.on_llm_error == "abort":
             raise
-        logger.error("Erro ao gerar %s: %s — pulando", doc.metadata.id, exc)
+        logger.error("Error generating %s: %s — skipping", doc.metadata.id, exc)
         return None

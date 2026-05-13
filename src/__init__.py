@@ -1,1 +1,1 @@
-# src — wiki-llm pipeline genérico
+# src — wiki-llm generic pipeline

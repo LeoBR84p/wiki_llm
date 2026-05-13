@@ -268,19 +268,19 @@ async def run_consolidate(
         # markdown_merge pre-pass
         try:
             markdown_merge(subdir, dedupe_headings=True)
-            logger.info("markdown_merge concluído: %s", subdir)
+            logger.info("markdown_merge complete: %s", subdir)
         except Exception as exc:  # noqa: BLE001
-            logger.warning("markdown_merge falhou: %s", exc)
+            logger.warning("markdown_merge failed: %s", exc)
 
         pages = _collect_pages(subdir)
         if len(pages) < 2:
             continue
 
-        logger.info("Consolidando %s: %d páginas", et.name, len(pages))
+        logger.info("Consolidating %s: %d pages", et.name, len(pages))
         groups = await _identify_groups(pages, cfg, llm, llm_logger)
-        logger.info("  %d grupos de duplicatas detectados", len(groups))
+        logger.info("  %d duplicate groups detected", len(groups))
 
         for group in groups:
             result = _execute_merge(cfg.wiki_dir, subdir, group)
             if result["merged"]:
-                logger.info("  Merged %s → %s", result["merged"], result["canonico"])
+                logger.info("  Merged %s → %s", result["merged"], result["canonical"])
