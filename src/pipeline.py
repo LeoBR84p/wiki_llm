@@ -25,6 +25,16 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    SpinnerColumn,
+    TaskProgressColumn,
+    TextColumn,
+    TimeElapsedColumn,
+)
+
 from .llm.factory import create_client
 from .llm.log import LLMLogger
 from .models.config import WikiConfig
@@ -108,112 +118,141 @@ async def run_pipeline(cfg: WikiConfig, opts: PipelineOptions | None = None) -> 
     llm_logger = LLMLogger(cfg.log_dir)
     llm = create_client(cfg.llm)
 
-    # ------------------------------------------------------------------
-    # 1. Read
-    # ------------------------------------------------------------------
-    docs: list[Document] = []
-    if "read" in stages:
-        logger.info("=== [read] Reading documents from %s", cfg.content_dir)
-        reader = FilesystemReader(cfg)
-        docs = await reader.read_all()
-        result.docs_read = len(docs)
-        logger.info("  %d documents read", result.docs_read)
+    progress = Progress(
+        SpinnerColumn(),
+        TextColumn("[bold cyan]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TaskProgressColumn(),
+        TimeElapsedColumn(),
+        transient=False,
+    )
 
-        # Apply status_filter
-        if cfg.status_filter:
-            before = len(docs)
-            docs = [d for d in docs if d.metadata.status in cfg.status_filter or not d.metadata.status]
-            logger.info("  status_filter: %d → %d documents", before, len(docs))
+    with progress:
 
-    # ------------------------------------------------------------------
-    # 2. Generate
-    # ------------------------------------------------------------------
-    if "generate" in stages and docs:
-        logger.info("=== [generate] Generating %d pages (workers=%d)", len(docs), opts.workers)
-        semaphore = asyncio.Semaphore(opts.workers)
-        cfg.wiki_dir.mkdir(parents=True, exist_ok=True)
-        processed_dir = cfg.get_processed_dir()
-        error_dir = cfg.get_error_dir()
+        # ------------------------------------------------------------------
+        # 1. Read
+        # ------------------------------------------------------------------
+        docs: list[Document] = []
+        if "read" in stages:
+            t_read = progress.add_task("[read] scanning documents…", total=None)
+            reader = FilesystemReader(cfg)
+            docs = await reader.read_all()
+            result.docs_read = len(docs)
 
-        async def _gen_one(doc: Document) -> tuple[Document, Path | None]:
-            async with semaphore:
-                try:
-                    page = await generate_page(doc, cfg, llm, llm_logger, force=opts.force)
-                except Exception as exc:  # noqa: BLE001
-                    logger.error("generate exception for %s: %s", doc.metadata.id, exc)
-                    page = None
-                return doc, page
+            if cfg.status_filter:
+                docs = [d for d in docs if d.metadata.status in cfg.status_filter or not d.metadata.status]
 
-        tasks = [_gen_one(doc) for doc in docs]
-        pair_results = await asyncio.gather(*tasks, return_exceptions=True)
+            progress.update(t_read, description=f"[read] {result.docs_read} documents", total=1, completed=1)
 
-        for r in pair_results:
-            if isinstance(r, Exception):
-                # Unexpected error inside _gen_one (rare)
-                result.pages_error += 1
-                logger.error("generate unexpected exception: %s", r)
-                continue
-            doc, page = r
-            if page is None:
-                result.pages_error += 1
-                if doc.content_path and doc.content_path.exists():
-                    _move_source(doc.content_path, error_dir)
-            else:
-                result.pages_generated += 1
-                if doc.content_path and doc.content_path.exists():
-                    _move_source(doc.content_path, processed_dir)
+        # ------------------------------------------------------------------
+        # 2. Generate
+        # ------------------------------------------------------------------
+        if "generate" in stages and docs:
+            semaphore = asyncio.Semaphore(opts.workers)
+            cfg.wiki_dir.mkdir(parents=True, exist_ok=True)
+            processed_dir = cfg.get_processed_dir()
+            error_dir = cfg.get_error_dir()
 
-    # ------------------------------------------------------------------
-    # 3. Taxonomy
-    # ------------------------------------------------------------------
-    if "taxonomy" in stages and cfg.taxonomies:
-        logger.info("=== [taxonomy]")
-        await run_taxonomy(cfg, llm, llm_logger)
+            t_gen = progress.add_task(
+                f"[generate] 0/{len(docs)} pages",
+                total=len(docs),
+                completed=0,
+            )
 
-    # ------------------------------------------------------------------
-    # 4. Groups
-    # ------------------------------------------------------------------
-    if "groups" in stages and cfg.groupings:
-        logger.info("=== [groups]")
-        await run_groups(cfg, docs)
+            async def _gen_one(doc: Document) -> tuple[Document, Path | None]:
+                async with semaphore:
+                    try:
+                        page = await generate_page(doc, cfg, llm, llm_logger, force=opts.force)
+                    except Exception as exc:  # noqa: BLE001
+                        logger.debug("generate exception for %s: %s", doc.metadata.id, exc)
+                        page = None
+                    finally:
+                        done = int(progress.tasks[t_gen].completed) + 1
+                        progress.update(
+                            t_gen,
+                            advance=1,
+                            description=f"[generate] {done}/{len(docs)} pages",
+                        )
+                    return doc, page
 
-    # ------------------------------------------------------------------
-    # 5. Index
-    # ------------------------------------------------------------------
-    if "index" in stages:
-        logger.info("=== [index]")
-        await run_index(cfg)
+            tasks = [_gen_one(doc) for doc in docs]
+            pair_results = await asyncio.gather(*tasks, return_exceptions=True)
 
-    # ------------------------------------------------------------------
-    # 6. Consolidate
-    # ------------------------------------------------------------------
-    if "consolidate" in stages:
-        logger.info("=== [consolidate]")
-        await run_consolidate(cfg, llm, llm_logger)
+            for r in pair_results:
+                if isinstance(r, Exception):
+                    result.pages_error += 1
+                    logger.debug("generate unexpected exception: %s", r)
+                    continue
+                doc, page = r
+                if page is None:
+                    result.pages_error += 1
+                    if doc.content_path and doc.content_path.exists():
+                        _move_source(doc.content_path, error_dir)
+                else:
+                    result.pages_generated += 1
+                    if doc.content_path and doc.content_path.exists():
+                        _move_source(doc.content_path, processed_dir)
 
-    # ------------------------------------------------------------------
-    # 7. Lint
-    # ------------------------------------------------------------------
-    repair_state = None
-    if "lint" in stages:
-        logger.info("=== [lint]")
-        repair_state = await run_lint(cfg, llm, llm_logger)
+        # ------------------------------------------------------------------
+        # 3. Taxonomy
+        # ------------------------------------------------------------------
+        if "taxonomy" in stages and cfg.taxonomies:
+            t_tax = progress.add_task("[taxonomy] normalizing terms…", total=None)
+            await run_taxonomy(cfg, llm, llm_logger)
+            progress.update(t_tax, description="[taxonomy] done", total=1, completed=1)
 
-    # ------------------------------------------------------------------
-    # 8. Repair
-    # ------------------------------------------------------------------
-    if "repair" in stages and repair_state is not None:
-        logger.info("=== [repair]")
-        repair_state = await run_repair(repair_state, cfg, llm, llm_logger)
+        # ------------------------------------------------------------------
+        # 4. Groups
+        # ------------------------------------------------------------------
+        if "groups" in stages and cfg.groupings:
+            t_grp = progress.add_task("[groups] building grouping pages…", total=None)
+            await run_groups(cfg, docs)
+            progress.update(t_grp, description="[groups] done", total=1, completed=1)
 
-    # ------------------------------------------------------------------
-    # 9. Export (Word)
-    # ------------------------------------------------------------------
-    if cfg.export_word:
-        _export_word(cfg)
+        # ------------------------------------------------------------------
+        # 5. Index
+        # ------------------------------------------------------------------
+        if "index" in stages:
+            t_idx = progress.add_task("[index] rebuilding index…", total=None)
+            await run_index(cfg)
+            progress.update(t_idx, description="[index] done", total=1, completed=1)
+
+        # ------------------------------------------------------------------
+        # 6. Consolidate
+        # ------------------------------------------------------------------
+        if "consolidate" in stages:
+            t_con = progress.add_task("[consolidate] merging duplicates…", total=None)
+            await run_consolidate(cfg, llm, llm_logger)
+            progress.update(t_con, description="[consolidate] done", total=1, completed=1)
+
+        # ------------------------------------------------------------------
+        # 7. Lint
+        # ------------------------------------------------------------------
+        repair_state = None
+        if "lint" in stages:
+            t_lint = progress.add_task("[lint] checking quality…", total=None)
+            repair_state = await run_lint(cfg, llm, llm_logger)
+            progress.update(t_lint, description="[lint] done", total=1, completed=1)
+
+        # ------------------------------------------------------------------
+        # 8. Repair
+        # ------------------------------------------------------------------
+        if "repair" in stages and repair_state is not None:
+            t_rep = progress.add_task("[repair] fixing broken links…", total=None)
+            repair_state = await run_repair(repair_state, cfg, llm, llm_logger)
+            progress.update(t_rep, description="[repair] done", total=1, completed=1)
+
+        # ------------------------------------------------------------------
+        # 9. Export (Word)
+        # ------------------------------------------------------------------
+        if cfg.export_word:
+            t_exp = progress.add_task("[export] generating .docx files…", total=None)
+            _export_word(cfg)
+            progress.update(t_exp, description="[export] done", total=1, completed=1)
 
     result.elapsed_s = time.monotonic() - t_start
-    logger.info(
+    logger.debug(
         "Pipeline complete in %.1fs | read=%d generated=%d errors=%d",
         result.elapsed_s, result.docs_read, result.pages_generated, result.pages_error,
     )

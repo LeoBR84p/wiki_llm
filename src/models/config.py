@@ -131,6 +131,7 @@ class WikiConfig(BaseModel):
     wiki_name: str
     wiki_dir: Path
     log_dir: Path
+    language: str = "english"
 
     # LLM
     llm: LLMConfig

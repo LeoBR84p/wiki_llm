@@ -158,7 +158,14 @@ async def _identify_groups(
     Returns:
         A flat list of duplicate group dicts parsed from all batch responses.
     """
-    system = cfg.prompt_consolidate.read_text(encoding="utf-8")
+    system = (
+        "You are a wiki editor. Given a list of wiki page titles, identify groups of "
+        "semantically duplicate or near-duplicate pages that should be merged into one.\n"
+        "Return ONLY a JSON array (no markdown, no explanation) where each element has:\n"
+        '  { "canonico": "<best canonical title>", "duplicatas": ["<dup1>", "<dup2>", ...] }\n'
+        "Only include groups with at least one duplicate. If there are no duplicates, return [].\n"
+        "Example: [{\"canonico\": \"Credit Risk\", \"duplicatas\": [\"Credit Risks\", \"Risk of Credit\"]}]"
+    )
     names = [p["name"] for p in pages]
     groups: list[dict[str, Any]] = []
 
@@ -174,13 +181,20 @@ async def _identify_groups(
                 cached_tokens=resp.cached_tokens, model_id=resp.model_id,
                 stage="consolidate.identify", elapsed=time.monotonic() - t0,
             )
-            bloco = re.search(r"\[.*\]", resp.text, re.DOTALL)
-            if bloco:
-                parsed = json.loads(bloco.group())
-                groups.extend(
-                    g for g in parsed
-                    if g.get("canonico") and isinstance(g.get("duplicatas"), list)
-                )
+            text = resp.text.strip()
+            # Strip optional ```json ... ``` code fence
+            m_fence = re.search(r"```(?:json)?\s*(\[.*?\])\s*```", text, re.DOTALL)
+            if m_fence:
+                text = m_fence.group(1)
+            else:
+                # Find outermost JSON array (non-greedy from first [ to matching ])
+                m_arr = re.search(r"\[.*\]", text, re.DOTALL)
+                text = m_arr.group() if m_arr else "[]"
+            parsed = json.loads(text)
+            groups.extend(
+                g for g in parsed
+                if g.get("canonico") and isinstance(g.get("duplicatas"), list)
+            )
         except Exception as exc:  # noqa: BLE001
             logger.warning("Consolidation lote %d falhou: %s", i, exc)
 
@@ -258,19 +272,10 @@ async def run_consolidate(
         llm: Active LLM client.
         llm_logger: Logger for all LLM calls made during this stage.
     """
-    from markdown_hero import markdown_merge  # noqa: PLC0415
-
     for et in cfg.entity_types:
         subdir = cfg.wiki_dir / et.wiki_subdir
         if not subdir.exists():
             continue
-
-        # markdown_merge pre-pass
-        try:
-            markdown_merge(subdir, dedupe_headings=True)
-            logger.info("markdown_merge complete: %s", subdir)
-        except Exception as exc:  # noqa: BLE001
-            logger.warning("markdown_merge failed: %s", exc)
 
         pages = _collect_pages(subdir)
         if len(pages) < 2:

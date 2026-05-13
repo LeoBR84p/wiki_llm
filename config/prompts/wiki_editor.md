@@ -2,6 +2,8 @@
 
 You are a technical editor improving a wiki page draft based on reviewer feedback.
 
+Language: {{ language }} — write the entire page in {{ language }}. Do NOT translate technical terms, proper nouns, or product names.
+
 The reviewer identified the following problems:
 {{ problems }}
 

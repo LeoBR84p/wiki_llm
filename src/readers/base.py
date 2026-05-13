@@ -36,3 +36,33 @@ class PdfReaderProtocol(Protocol):
     """
 
     def extract_text(self, path: Path) -> str: ...
+
+
+class MarkItDownPdfReader:
+    """PDF reader that delegates to markitdown + pdfminer.six.
+
+    Requires ``pdfminer.six`` to be installed (``uv add pdfminer.six``).
+    Works with digitally-created PDFs; does not perform OCR.
+
+    Example::
+
+        from src.readers.base import MarkItDownPdfReader
+        pdf_reader = MarkItDownPdfReader()
+    """
+
+    def extract_text(self, path: Path) -> str:
+        """Extract plain text from a PDF file via MarkItDown.
+
+        Args:
+            path: Path to the PDF file.
+
+        Returns:
+            Extracted text as a Markdown string.
+
+        Raises:
+            ImportError: If markitdown or pdfminer.six is not installed.
+            Exception: If the PDF cannot be read.
+        """
+        from markitdown import MarkItDown  # noqa: PLC0415
+        result = MarkItDown().convert(str(path))
+        return result.text_content or ""

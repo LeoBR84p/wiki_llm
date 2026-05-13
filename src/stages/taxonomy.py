@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import time
 from pathlib import Path
@@ -22,6 +23,7 @@ from ..models.config import TaxonomyConfig, WikiConfig
 logger = logging.getLogger(__name__)
 
 _RE_WIKILINK = re.compile(r"\[\[([^\]]+)\]\]")
+_RE_MDLINK = re.compile(r"\[([^\]]+)\]\([^)]+\)")
 _CHARS_INVALID = frozenset('\\/:*?"<>|')
 _SYSTEM_PAGES = {"index.md", "log.md"}
 
@@ -87,7 +89,9 @@ def collect_terms(wiki_dir: Path, tax_cfg: TaxonomyConfig) -> dict[str, list[str
         if not m:
             continue
         page_id = md_file.stem
-        for term in _RE_WIKILINK.findall(m.group(1)):
+        section_text = m.group(1)
+        raw_terms = _RE_WIKILINK.findall(section_text) + _RE_MDLINK.findall(section_text)
+        for term in raw_terms:
             t = term.strip()
             if t:
                 terms.setdefault(t, [])
@@ -132,7 +136,7 @@ async def normalize_terms(
     for i in range(0, len(names), batch_size):
         batch = names[i: i + batch_size]
         user = "\n".join(f"- {n}" for n in batch)
-        system = Template(system_tpl).render()
+        system = Template(system_tpl).render(language=cfg.language)
 
         t0 = llm_logger.start_call()
         try:
@@ -212,12 +216,21 @@ async def generate_taxonomy_pages(
         if dest.exists():
             continue  # incremental: do not overwrite
 
-        links = ", ".join(f"[[{pid}]]" for pid in sorted(page_ids))
+        links_parts = []
+        for pid in sorted(page_ids):
+            found = next((f for f in cfg.wiki_dir.rglob(f"{pid}.md") if f.stem == pid), None)
+            if found:
+                rel = os.path.relpath(found, tax_dir).replace("\\", "/")
+                links_parts.append(f"[{pid}]({rel})")
+            else:
+                links_parts.append(f"[[{pid}]]")
+        links = ", ".join(links_parts)
         context = {
             "term": norm_term,
             "page_ids": page_ids,
             "links": links,
             "taxonomy": tax_cfg.name,
+            "language": cfg.language,
         }
         system = Template(system_tpl).render(**context)
         user = f"Term: {norm_term}\nPages: {links}"

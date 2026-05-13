@@ -72,8 +72,8 @@ class LLMLogger:
             log_dir: Directory where the two JSONL files will be written.
         """
         self._run_id = datetime.now(UTC).strftime("%Y%m%dT%H%M%S") + "_" + uuid.uuid4().hex[:6]
-        self._summary = log_dir / f"{self._run_id}_summary.jsonl"
-        self._detail = log_dir / f"{self._run_id}_detail.jsonl"
+        self._summary = log_dir / "llm_token_summary.jsonl"
+        self._detail = log_dir / "llm_interaction_detail.jsonl"
         self._start: float = 0.0
 
     def start_call(self) -> float:

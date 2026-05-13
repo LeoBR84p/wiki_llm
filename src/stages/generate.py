@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from jinja2 import Template
+from markdown_hero import normalize as md_normalize
 
 from ..llm.base import BaseLLMClient, LLMResponse
 from ..llm.log import LLMLogger
@@ -46,6 +47,22 @@ def _safe_filename(s: str) -> str:
         A sanitized string safe to use as a filename stem.
     """
     return "".join(c if c not in _CHARS_INVALID else "-" for c in s).strip(". ")
+
+
+def _title_from_draft(draft: str) -> str | None:
+    """Extract the first H1 heading from a Markdown draft.
+
+    Args:
+        draft: Markdown text produced by the writer LLM.
+
+    Returns:
+        The heading text (without the leading ``#``), or None if not found.
+    """
+    for line in draft.splitlines():
+        stripped = line.lstrip()
+        if stripped.startswith("# "):
+            return stripped[2:].strip().upper()
+    return None
 
 
 def _truncate(text: str, max_chars: int) -> tuple[str, bool]:
@@ -179,7 +196,7 @@ def _write_raw_page(doc: Document, entity_cfg: EntityTypeConfig, wiki_dir: Path,
         "---",
         "",
     ]
-    full = "\n".join(fm_lines) + doc.content + "\n"
+    full = "\n".join(fm_lines) + md_normalize(doc.content) + "\n"
     _write_atomic(raw_path, full)
     return raw_path
 
@@ -241,7 +258,7 @@ async def _generate_draft(
     Returns:
         The raw LLM response text (the initial draft).
     """
-    content, truncated = _truncate(doc.content, cfg.max_chars_input)
+    content, truncated = _truncate(md_normalize(doc.content), cfg.max_chars_input)
     if truncated:
         logger.warning("[TRUNCATED] %s: %d → %d chars", doc.metadata.id, len(doc.content), cfg.max_chars_input)
 
@@ -249,6 +266,7 @@ async def _generate_draft(
         "document": content,
         "metadata": doc.metadata.model_dump(),
         "entity_type": entity_cfg.name,
+        "language": cfg.language,
     }
     system = _render_prompt(entity_cfg.prompt_generate, context)
     user = content
@@ -294,6 +312,7 @@ async def _evaluate_draft(
         "draft": draft,
         "metadata": doc.metadata.model_dump(),
         "entity_type": entity_cfg.name,
+        "language": cfg.language,
     }
     system = _render_prompt(entity_cfg.prompt_evaluate, context)
     user = draft
@@ -334,6 +353,7 @@ async def _edit_draft(
         "draft": draft,
         "problems": problems,
         "suggestions": suggestions,
+        "language": cfg.language,
     }
     system = _render_prompt(cfg.prompt_editor, context)
     user = f"**Problems:**\n{problems}\n\n**Suggestions:**\n{suggestions}\n\n**Draft:**\n{draft}"
@@ -387,11 +407,15 @@ async def generate_page(
             doc.metadata.entity_type, doc.metadata.id, entity_cfg.slug,
         )
 
-    dest = cfg.wiki_dir / entity_cfg.wiki_subdir / f"{_safe_filename(doc.metadata.id)}.md"
+    subdir = cfg.wiki_dir / entity_cfg.wiki_subdir
 
-    if dest.exists() and not force:
-        logger.debug("Incremental: skipping %s (already exists)", dest.name)
-        return dest
+    # Incremental pre-check: use the source metadata title as a best-effort guess
+    # for the final filename so we can skip the LLM call when the page already exists.
+    _preliminary_slug = _safe_filename(doc.metadata.title or doc.metadata.id)
+    _preliminary_dest = subdir / f"{_preliminary_slug}.md"
+    if _preliminary_dest.exists() and not force:
+        logger.debug("Incremental: skipping %s (already exists)", _preliminary_dest.name)
+        return _preliminary_dest
 
     generated_at = datetime.now(UTC).isoformat()
 
@@ -405,10 +429,22 @@ async def generate_page(
             if round_n < entity_cfg.max_rounds:
                 draft = await _edit_draft(draft, evaluation, doc, cfg, llm, llm_logger)
 
+        # Derive filename from the H1 title the LLM wrote; fallback to UUID
+        page_title = _title_from_draft(draft)
+        if page_title:
+            dest = subdir / f"{_safe_filename(page_title)}.md"
+        else:
+            dest = subdir / f"{_safe_filename(doc.metadata.id)}.md"
+            logger.warning("No H1 found in draft for %s — using UUID filename", doc.metadata.id)
+
+        if dest.exists() and not force:
+            logger.debug("Incremental: skipping %s (already exists)", dest.name)
+            return dest
+
         # Write original content before the wiki page
         _write_raw_page(doc, entity_cfg, cfg.wiki_dir, generated_at)
 
-        raw_link = f"[[{_raw_id(doc.metadata.id)}]]"
+        raw_link = f"[Original Content](raw/{_raw_id(doc.metadata.id)}.md)"
         source_section = (
             "\n\n---\n\n"
             "## Original Document\n\n"

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class PageEvaluation(BaseModel):
@@ -43,3 +43,16 @@ class RepairState(BaseModel):
     broken_links: list[dict[str, Any]] = Field(default_factory=list)
     repaired: list[str] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
+
+    model_config = {"arbitrary_types_allowed": True}
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce_wiki_dir(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "wiki_dir" in data:
+            data["wiki_dir"] = str(data["wiki_dir"])
+        return data

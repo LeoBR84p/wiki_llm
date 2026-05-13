@@ -32,6 +32,8 @@ from pathlib import Path
 from typing import Optional
 
 import typer
+from rich.console import Console
+from rich.logging import RichHandler
 
 from .models.config import WikiConfig
 from .pipeline import PipelineOptions, run_pipeline
@@ -48,18 +50,25 @@ _DEFAULT_CONFIG = Path("config/wiki_config.py")
 def _setup_logging(verbose: bool = False) -> None:
     """Configure root logging for the CLI session.
 
-    Sets DEBUG level when verbose is True, INFO otherwise.
-    Uses a timestamped format that is easy to read in terminal output.
+    Sets DEBUG level when verbose is True, WARNING otherwise (errors only).
+    Uses RichHandler for clean output that coexists with the progress bar.
+    Third-party chatty loggers (openai, httpx) are silenced unless verbose.
 
     Args:
         verbose: When True, enable DEBUG-level log output.
     """
-    level = logging.DEBUG if verbose else logging.INFO
+    level = logging.DEBUG if verbose else logging.WARNING
     logging.basicConfig(
         level=level,
-        format="%(asctime)s %(levelname)-8s %(name)s - %(message)s",
+        format="%(message)s",
         datefmt="%H:%M:%S",
+        handlers=[RichHandler(rich_tracebacks=True, show_path=False)],
     )
+    # Always silence very chatty third-party loggers
+    for noisy in ("openai", "openai._base_client", "httpx", "httpcore", "urllib3"):
+        logging.getLogger(noisy).setLevel(logging.ERROR)
+    # src loggers: DEBUG in verbose mode, WARNING otherwise
+    logging.getLogger("src").setLevel(logging.DEBUG if verbose else logging.WARNING)
 
 
 def _load_config(config_path: Path) -> WikiConfig:

@@ -16,3 +16,8 @@ wheels/
 TODO.md
 PLAN.md
 pyptoject.toml
+
+#Wiki itself
+wiki/
+content_*/
+logs/

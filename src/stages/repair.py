@@ -371,7 +371,7 @@ async def run_repair(
         The input RepairState updated with repaired and errors lists.
     """
     try:
-        from langgraph.graph import StateGraph, END  # noqa: PLC0415
+        from langgraph.graph import StateGraph, END, START  # noqa: PLC0415
         from langgraph.constants import Send  # noqa: PLC0415
     except ImportError:
         logger.warning("langgraph not installed — automatic repair disabled")
@@ -379,8 +379,10 @@ async def run_repair(
 
     wiki_dir = repair_state.wiki_dir
 
-    async def dispatch(state: RepairGlobalState):  # noqa: ANN202
+    def dispatch(state: RepairGlobalState):  # noqa: ANN202
         items = _build_item_states(state)
+        if not items:
+            return [END]
         return [Send("repair_item", item) for item in items]
 
     async def repair_item(item: RepairItemState) -> dict[str, Any]:
@@ -392,10 +394,8 @@ async def run_repair(
         return {"repaired": repaired, "errors": errors}
 
     builder: StateGraph = StateGraph(RepairGlobalState)
-    builder.add_node("dispatch", dispatch)
     builder.add_node("repair_item", repair_item)
-    builder.set_entry_point("dispatch")
-    builder.add_conditional_edges("dispatch", lambda _: _, ["repair_item"])
+    builder.add_conditional_edges(START, dispatch, ["repair_item", END])
     builder.add_edge("repair_item", END)
     graph = builder.compile()
 
