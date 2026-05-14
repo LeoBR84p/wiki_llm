@@ -44,4 +44,4 @@ def create_client(config: LLMConfig) -> BaseLLMClient:
             from .ollama import OllamaClient  # noqa: PLC0415
             return OllamaClient(config)
         case _:
-            raise ValueError(f"Backend desconhecido: {config.backend}")
+            raise ValueError(f"Unknown backend: {config.backend}")

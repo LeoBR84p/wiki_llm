@@ -40,18 +40,6 @@ _creating_pages_lock = threading.Lock()
 
 
 def _file_lock(path: Path) -> threading.Lock:
-    """Return (or create) a per-file threading.Lock for the given path.
-
-    Uses a global dict keyed by the resolved absolute path string so that
-    concurrent async tasks repairing different pages never contend on the
-    same lock.
-
-    Args:
-        path: The file path that needs exclusive write access.
-
-    Returns:
-        A threading.Lock unique to that file path.
-    """
     key = str(path.resolve())
     with _file_locks_meta:
         if key not in _file_locks:
@@ -60,16 +48,8 @@ def _file_lock(path: Path) -> threading.Lock:
 
 
 def _safe_slug(name: str) -> str:
-    """Convert a link target name to a lowercase, filesystem-safe slug.
-
-    Args:
-        name: Raw link target string (e.g. from a broken wikilink).
-
-    Returns:
-        A slug with invalid chars replaced by hyphens and consecutive hyphens collapsed.
-    """
     s = "".join(c if c not in _CHARS_INVALID else "-" for c in name.lower().strip())
-    return re.sub(r"-{2,}", "-", s).strip("-") or "pagina"
+    return re.sub(r"-{2,}", "-", s).strip("-") or "page"
 
 
 def _write_atomic(path: Path, content: str, skip_if_exists: bool = False) -> bool:
@@ -97,15 +77,6 @@ def _write_atomic(path: Path, content: str, skip_if_exists: bool = False) -> boo
 
 
 def _find_page(wiki_dir: Path, stem: str) -> Path | None:
-    """Search wiki_dir recursively for a Markdown file with the given stem.
-
-    Args:
-        wiki_dir: Root wiki directory to search.
-        stem: The filename stem (without extension) to find.
-
-    Returns:
-        The first matching Path, or None if not found.
-    """
     matches = list(wiki_dir.rglob(f"{stem}.md"))
     return matches[0] if matches else None
 
@@ -253,7 +224,7 @@ async def _repair_broken_link(
         # Try to find similar existing page
         source_links = "\n".join(f"- [[{s}]]" for s in sources[:20])
         system = cfg.prompt_lint.read_text(encoding="utf-8")
-        user = f"Link quebrado: **{target}**\n\nReferenciado em:\n{source_links}"
+        user = f"Broken link: **{target}**\n\nReferenced in:\n{source_links}"
 
         t0 = llm_logger.start_call()
         try:
@@ -268,8 +239,8 @@ async def _repair_broken_link(
             fm = (
                 "---\n"
                 f'title: "{title_safe}"\n'
-                "tipo: stub\n"
-                "fonte: agente_reparo\n"
+                "type: stub\n"
+                "source: repair_agent\n"
                 "---\n"
             )
             content = f"{fm}\n# {target}\n\n{resp.text.strip()}\n\n"

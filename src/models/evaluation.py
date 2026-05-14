@@ -44,12 +44,6 @@ class RepairState(BaseModel):
     repaired: list[str] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
 
-    model_config = {"arbitrary_types_allowed": True}
-
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
     @model_validator(mode="before")
     @classmethod
     def _coerce_wiki_dir(cls, data: Any) -> Any:

@@ -19,14 +19,6 @@ _SYSTEM_FILES = {"index.md"}
 
 
 def _collect_pages(directory: Path) -> list[Path]:
-    """Return a sorted list of Markdown files in a directory, excluding system files.
-
-    Args:
-        directory: The directory to list.  Returns an empty list if it does not exist.
-
-    Returns:
-        Sorted list of .md Path objects, excluding index.md.
-    """
     if not directory.exists():
         return []
     return sorted(
@@ -46,7 +38,7 @@ async def run_index(cfg: WikiConfig) -> None:
     """
     lines: list[str] = [
         "---",
-        "tipo: indice",
+        "type: index",
         "---",
         "",
         "# Wiki Index",
@@ -66,7 +58,7 @@ async def run_index(cfg: WikiConfig) -> None:
         lines.append("")
 
     if cfg.taxonomies:
-        lines.append("## Taxonomias")
+        lines.append("## Taxonomies")
         lines.append("")
         for tax in cfg.taxonomies:
             subdir = cfg.wiki_dir / tax.wiki_subdir
@@ -78,7 +70,7 @@ async def run_index(cfg: WikiConfig) -> None:
             lines.append("")
 
     if cfg.groupings:
-        lines.append("## Agrupamentos")
+        lines.append("## Groupings")
         lines.append("")
         for grp in cfg.groupings:
             subdir = cfg.wiki_dir / grp.wiki_subdir

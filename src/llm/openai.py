@@ -36,7 +36,7 @@ class OpenAIClient:
         self._cfg = config
         api_key = os.environ.get("OPENAI_API_KEY", "").strip()
         if not api_key:
-            raise RuntimeError("OPENAI_API_KEY ausente no .env.")
+            raise RuntimeError("OPENAI_API_KEY not set in environment.")
         self._client = AsyncOpenAI(api_key=api_key)
         self._instructor = instructor.from_openai(self._client)
 

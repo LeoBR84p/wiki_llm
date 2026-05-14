@@ -24,25 +24,11 @@ _CHARS_INVALID = frozenset('\\/:*?"<>|')
 
 
 def _safe_slug(name: str) -> str:
-    """Convert a group value to a filesystem-safe slug for use as a page filename stem.
-
-    Args:
-        name: The raw metadata field value (e.g. a team name or category).
-
-    Returns:
-        A sanitized slug string safe for use as a filename.
-    """
     s = "".join(c if c not in _CHARS_INVALID else "-" for c in name)
-    return s.strip(". ") or "grupo-sem-nome"
+    return s.strip(". ") or "unnamed-group"
 
 
 def _write_atomic(path: Path, content: str) -> None:
-    """Write content to path via a temporary file, then atomically rename.
-
-    Args:
-        path: Destination file path.
-        content: UTF-8 text to write.
-    """
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.stem + f"._tmp_{uuid.uuid4().hex[:8]}" + path.suffix)
     try:
@@ -54,19 +40,6 @@ def _write_atomic(path: Path, content: str) -> None:
 
 
 def _group_value(doc: Document, field: str) -> str | None:
-    """Extract the grouping field value from a Document.
-
-    Looks up ``field`` in metadata.extra first, then falls back to a direct
-    attribute on DocumentMetadata (e.g. ``status``).  Returns None if the
-    field is absent or empty, so the document is excluded from grouping.
-
-    Args:
-        doc: The Document to inspect.
-        field: The metadata field name to retrieve.
-
-    Returns:
-        The field value as a stripped string, or None if not present.
-    """
     val = doc.metadata.extra.get(field) or getattr(doc.metadata, field, None)
     if val:
         return str(val).strip()
@@ -89,11 +62,9 @@ def _page_content(group_name: str, field: str, docs: list[Document], grp_cfg: Gr
     Returns:
         A complete Markdown string ready to be written to disk.
     """
-    slug = _safe_slug(group_name)
-    links = ", ".join(f"[[{d.metadata.id}]]" for d in sorted(docs, key=lambda d: d.metadata.id))
     lines = [
         "---",
-        f'tipo: grouping',
+        "type: grouping",
         f'field: {field}',
         f'value: "{group_name}"',
         f"total: {len(docs)}",

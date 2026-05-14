@@ -12,6 +12,7 @@ import logging
 import os
 import re
 import time
+import uuid
 from pathlib import Path
 
 from jinja2 import Template
@@ -23,22 +24,25 @@ from ..models.config import TaxonomyConfig, WikiConfig
 logger = logging.getLogger(__name__)
 
 _RE_WIKILINK = re.compile(r"\[\[([^\]]+)\]\]")
+
+
+def _write_atomic(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.stem + f"._tmp_{uuid.uuid4().hex[:8]}" + path.suffix)
+    try:
+        tmp.write_text(content, encoding="utf-8")
+        tmp.replace(path)
+    except Exception:
+        tmp.unlink(missing_ok=True)
+        raise
 _RE_MDLINK = re.compile(r"\[([^\]]+)\]\([^)]+\)")
 _CHARS_INVALID = frozenset('\\/:*?"<>|')
 _SYSTEM_PAGES = {"index.md", "log.md"}
 
 
 def _safe_slug(name: str) -> str:
-    """Convert a term name to a filesystem-safe slug for use as a filename stem.
-
-    Args:
-        name: Human-readable term name (e.g. "Quality Management").
-
-    Returns:
-        A sanitized slug string (e.g. "Quality-Management").
-    """
-    s = "".join(c if c not in _CHARS_INVALID else "-" for name_char in name for c in [name_char])
-    return s.strip(". ") or "tema-sem-nome"
+    s = "".join(c if c not in _CHARS_INVALID else "-" for c in name)
+    return s.strip(". ") or "unnamed-term"
 
 
 def _section_pattern(header: str) -> re.Pattern:
@@ -235,13 +239,12 @@ async def normalize_terms(
                 cached_tokens=resp.cached_tokens, model_id=resp.model_id,
                 stage="taxonomy.normalize", elapsed=time.monotonic() - t0,
             )
-            # Expected: JSON object or list {bruto: normalizado}
+            # Expected: JSON object {raw_term: canonical_term}
             bloco = re.search(r"\{.*\}", resp.text, re.DOTALL)
             if bloco:
                 parsed = json.loads(bloco.group())
                 mapping.update(parsed)
             else:
-                # Fallback: identity mapping
                 for n in batch:
                     mapping[n] = n
         except Exception as exc:  # noqa: BLE001
@@ -274,19 +277,6 @@ async def generate_taxonomy_pages(
         llm: Active LLM client.
         llm_logger: Logger to record each page-creation call.
     """
-    import uuid as _uuid, time as _time  # noqa: E401
-
-    def _write_atomic(path: Path, content: str) -> None:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = path.with_name(path.stem + f"._tmp_{_uuid.uuid4().hex[:8]}" + path.suffix)
-        try:
-            tmp.write_text(content, encoding="utf-8")
-            tmp.replace(path)
-        except Exception:
-            tmp.unlink(missing_ok=True)
-            raise
-
-    # Pivot: normalizado → [page_ids]
     pivot: dict[str, list[str]] = {}
     for raw_term, page_ids in terms.items():
         normalized = mapping.get(raw_term, raw_term)
@@ -330,7 +320,7 @@ async def generate_taxonomy_pages(
                 system=system, user=user, output=resp.text,
                 tokens_in=resp.tokens_in, tokens_out=resp.tokens_out,
                 cached_tokens=resp.cached_tokens, model_id=resp.model_id,
-                stage="taxonomy.create_page", elapsed=_time.monotonic() - t0,
+                stage="taxonomy.create_page", elapsed=time.monotonic() - t0,
             )
             _write_atomic(dest, resp.text)
             logger.info("Taxonomy page generated: %s", dest)

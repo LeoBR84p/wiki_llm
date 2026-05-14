@@ -35,29 +35,11 @@ _CHARS_INVALID = frozenset('\\/:*?"<>|')
 
 
 def _safe_filename(s: str) -> str:
-    """Strip characters that are invalid in filenames on Windows and Unix.
-
-    Replaces each forbidden character with a hyphen and trims leading/trailing
-    dots and spaces that would confuse some filesystems.
-
-    Args:
-        s: Candidate filename string (typically a UUID).
-
-    Returns:
-        A sanitized string safe to use as a filename stem.
-    """
     return "".join(c if c not in _CHARS_INVALID else "-" for c in s).strip(". ")
 
 
 def _title_from_draft(draft: str) -> str | None:
-    """Extract the first H1 heading from a Markdown draft.
-
-    Args:
-        draft: Markdown text produced by the writer LLM.
-
-    Returns:
-        The heading text (without the leading ``#``), or None if not found.
-    """
+    """Extract the first H1 heading from a Markdown draft, or None."""
     for line in draft.splitlines():
         stripped = line.lstrip()
         if stripped.startswith("# "):
@@ -66,19 +48,6 @@ def _title_from_draft(draft: str) -> str | None:
 
 
 def _truncate(text: str, max_chars: int) -> tuple[str, bool]:
-    """Truncate text to at most max_chars characters.
-
-    Returns the (possibly truncated) text and a boolean indicating whether
-    truncation occurred.  Used to keep LLM input within context window limits
-    without silently discarding content.
-
-    Args:
-        text: Input text to potentially truncate.
-        max_chars: Maximum allowed length in characters.
-
-    Returns:
-        A tuple of (text, was_truncated).
-    """
     if len(text) <= max_chars:
         return text, False
     return text[:max_chars], True
@@ -120,36 +89,11 @@ def _write_atomic(path: Path, content: str) -> None:
 
 
 def _render_prompt(prompt_path: Path, context: dict[str, Any]) -> str:
-    """Read a Jinja2 prompt template from disk and render it with the given context.
-
-    Templates are re-read on each call so that changes to prompt files are
-    picked up without restarting the pipeline.  Uses Jinja2's default
-    auto-escaping disabled mode since prompts are plain text, not HTML.
-
-    Args:
-        prompt_path: Path to the .md or .txt Jinja2 template file.
-        context: Dict of variables to inject into the template.
-
-    Returns:
-        The rendered prompt string.
-    """
     template_src = prompt_path.read_text(encoding="utf-8")
     return Template(template_src).render(**context)
 
 
 def _raw_id(doc_id: str) -> str:
-    """Build the wikilink-compatible ID for the raw page of a document.
-
-    Appends ``_raw`` to the document UUID so that both the wiki page and its
-    corresponding raw page can coexist in the same subdirectory without
-    filename collisions.
-
-    Args:
-        doc_id: The content-addressable UUID of the document.
-
-    Returns:
-        A string of the form ``"{doc_id}_raw"``.
-    """
     return f"{doc_id}_raw"
 
 
@@ -400,7 +344,6 @@ async def generate_page(
     """
     entity_cfg = cfg.entity_type_by_slug(doc.metadata.entity_type)
     if entity_cfg is None:
-        # Tenta o primeiro tipo como fallback
         entity_cfg = cfg.entity_types[0]
         logger.warning(
             "entity_type '%s' unknown for %s — using '%s'",

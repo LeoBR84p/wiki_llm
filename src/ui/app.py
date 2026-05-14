@@ -62,12 +62,12 @@ def start_ui(cfg: WikiConfig, *, host: str = "0.0.0.0", port: int = 8080) -> Non
                 with messages_container:
                     with ui.card().classes("w-full bg-blue-1"):
                         ui.label(f"You: {question}").classes("text-body1")
-                    thinking = ui.label("...pensando...").classes("text-grey")
+                    thinking = ui.label("...thinking...").classes("text-grey")
 
                 try:
                     answer = await engine.ask(question, llm)
                 except Exception as exc:  # noqa: BLE001
-                    answer = f"Erro: {exc}"
+                    answer = f"Error: {exc}"
 
                 thinking.delete()
                 with messages_container:
@@ -77,7 +77,7 @@ def start_ui(cfg: WikiConfig, *, host: str = "0.0.0.0", port: int = 8080) -> Non
             with ui.row().classes("w-full"):
                 input_box = ui.input(placeholder="Ask a question about the wiki...").classes("flex-1")
                 input_box.on("keydown.enter", send_message)
-                ui.button("Enviar", on_click=send_message).props("color=primary")
+                ui.button("Send", on_click=send_message).props("color=primary")
 
             with ui.row():
                 ui.button("Clear history", on_click=lambda: (engine.clear_history(), messages_container.clear()))

@@ -27,29 +27,10 @@ _EXCLUDE_FILES = {"index.md", "log.md", "lint_report.md"}
 
 
 def _extract_wikilinks(text: str) -> set[str]:
-    """Extract all unique wikilink targets from a Markdown text.
-
-    Args:
-        text: The Markdown source text to scan.
-
-    Returns:
-        A set of slug strings referenced inside [[...]] link syntax.
-    """
     return set(re.findall(r"\[\[([^\]]+)\]\]", text))
 
 
 def _load_pages(wiki_dir: Path) -> dict[str, str]:
-    """Load all non-system wiki pages into a dict keyed by page stem.
-
-    Skips index.md, log.md, lint_report.md, and any file whose stem starts
-    with ``lint_`` to avoid the lint report referencing itself.
-
-    Args:
-        wiki_dir: Root wiki directory to scan recursively.
-
-    Returns:
-        A dict mapping page stem (e.g. ``"3f6a1b2c-..."``) to full Markdown text.
-    """
     pages: dict[str, str] = {}
     for p in wiki_dir.rglob("*.md"):
         if p.name in _EXCLUDE_FILES or p.stem.startswith("lint_"):
@@ -162,11 +143,11 @@ async def run_lint(
         f"**Total pages:** {stats['total_paginas']}",
         f"**Total links:** {stats['total_links']}",
         f"**Orphan pages ({len(orphans)}):** {', '.join(orphans[:30])}",
-        f"**Links quebrados ({len(broken_links)}):** "
+        f"**Broken links ({len(broken_links)}):** "
         + ", ".join(f"{b['origem']}→{b['destino']}" for b in broken_links[:20]),
     ]
     if mh_issues:
-        context_lines.append(f"\n**Problemas markdown ({len(mh_issues)}):**\n" + "\n".join(mh_issues[:40]))
+        context_lines.append(f"\n**Markdown issues ({len(mh_issues)}):**\n" + "\n".join(mh_issues[:40]))
 
     user = "\n".join(context_lines)
     t0 = llm_logger.start_call()
@@ -186,7 +167,7 @@ async def run_lint(
     # --- Write report ---
     report_lines = [
         "---",
-        "tipo: lint_report",
+        "type: lint_report",
         "---",
         "",
         "# Lint Report",

@@ -22,6 +22,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import logging
+import re
 import uuid
 from pathlib import Path
 
@@ -35,22 +36,9 @@ logger = logging.getLogger(__name__)
 _SUPPORTED = {".md", ".txt", ".docx", ".pptx", ".xlsx", ".pdf"}
 
 
-def _content_uuid(clean_text: str) -> str:
-    """Derive a deterministic UUID from the SHA-256 of the stripped document body.
+def _slugify(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
 
-    Uses the first 16 bytes of the SHA-256 digest to construct a UUID, giving
-    a content-addressable identifier that is stable across filename renames,
-    metadata edits, and re-ingestion of identical content.  Invariant to
-    superficial formatting differences because md_strip() is applied first.
-
-    Args:
-        clean_text: Stripped Markdown body (output of markdown_hero.strip()).
-
-    Returns:
-        A UUID string in canonical hyphenated form (e.g. "6ba7b810-9dad-...").
-    """
-    digest = hashlib.sha256(clean_text.encode("utf-8")).digest()
-    return str(uuid.UUID(bytes=digest[:16]))
 
 
 def _humanize(stem: str) -> str:
@@ -93,18 +81,17 @@ def _extract_md(raw: str, path: Path, cfg: WikiConfig, default_slug: str) -> Doc
     meta = extract_frontmatter(raw)
     body, _ = remove_frontmatter(raw)
 
-    # Hash sobre texto limpo — invariante a formatação superficial (espaços, pontuação, acentos)
     clean = md_strip(body)
-    doc_id = _content_uuid(clean)
+    clean_bytes = clean.encode("utf-8")
+    digest = hashlib.sha256(clean_bytes)
+    doc_id = str(uuid.UUID(bytes=digest.digest()[:16]))
 
-    # Descriptive fields: read from frontmatter, fallback to filename
     title = str(meta.get("title") or meta.get("titulo") or _humanize(path.stem))
     entity_type = str(meta.get("entity_type") or default_slug)
     status = str(meta.get("status") or "")
 
-    # Metadados extras: apenas campos do domínio, sem source_id
     extra = {k: v for k, v in meta.items() if k not in {"id", "norma_id", "title", "titulo", "entity_type", "status"}}
-    extra["content_sha256"] = hashlib.sha256(clean.encode("utf-8")).hexdigest()
+    extra["content_sha256"] = digest.hexdigest()
     extra["source_filename"] = path.name
 
     return Document(

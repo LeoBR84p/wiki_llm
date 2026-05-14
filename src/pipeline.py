@@ -287,17 +287,6 @@ def _export_word(cfg: WikiConfig) -> None:
 
 
 def _move_source(source: Path, dest_dir: Path) -> None:
-    """Move a source file to dest_dir after processing, handling name collisions.
-
-    If a file with the same name already exists in dest_dir, appends a 6-char
-    SHA-1 suffix derived from the source path to avoid silent overwrites.  All
-    exceptions are caught and logged as warnings so that a failed move never
-    interrupts the pipeline.
-
-    Args:
-        source: Path of the file to move.
-        dest_dir: Destination directory (created if it does not exist).
-    """
     try:
         dest_dir.mkdir(parents=True, exist_ok=True)
         dest = dest_dir / source.name

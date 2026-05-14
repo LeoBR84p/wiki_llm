@@ -88,7 +88,7 @@ class ChatEngine:
         try:
             from rank_bm25 import BM25Okapi  # noqa: PLC0415
         except ImportError as exc:
-            raise RuntimeError("rank_bm25 não instalado. Execute: pip install rank-bm25") from exc
+            raise RuntimeError("rank_bm25 not installed. Run: pip install rank-bm25") from exc
 
         self._corpus = []
         self._slugs = []
@@ -168,21 +168,19 @@ class ChatEngine:
         context_parts: list[str] = []
         for slug, content in relevant:
             context_parts.append(f"### [[{slug}]]\n{content[:3000]}")
-        context = "\n\n---\n\n".join(context_parts) or "(sem contexto relevante)"
+        context = "\n\n---\n\n".join(context_parts) or "(no relevant context)"
 
         system_tpl = self._cfg.prompt_chat.read_text(encoding="utf-8")
         from jinja2 import Template  # noqa: PLC0415
         system = Template(system_tpl).render(wiki_name=self._cfg.wiki_name)
 
-        # Build conversation
-        messages_user = f"**Contexto da wiki:**\n\n{context}\n\n**Pergunta:**\n{question}"
+        messages_user = f"**Wiki context:**\n\n{context}\n\n**Question:**\n{question}"
 
-        # Include history in system for simplicity (avoids complex message threading)
         if self._history:
             history_text = "\n".join(
                 f"[{m['role']}]: {m['content']}" for m in self._history[-max_history:]
             )
-            messages_user = f"**Histórico:**\n{history_text}\n\n{messages_user}"
+            messages_user = f"**History:**\n{history_text}\n\n{messages_user}"
 
         resp = await llm.call(system, messages_user)
         answer = resp.text

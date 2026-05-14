@@ -31,16 +31,8 @@ _CHARS_INVALID = frozenset('\\/:*?"<>|')
 
 
 def _safe_slug(name: str) -> str:
-    """Convert a page title to a lowercase, filesystem-safe slug.
-
-    Args:
-        name: The page title or canonical name.
-
-    Returns:
-        A lowercase hyphenated slug with consecutive hyphens collapsed.
-    """
     s = "".join(c if c not in _CHARS_INVALID else "-" for c in name.lower().strip())
-    return re.sub(r"-{2,}", "-", s).strip("-") or "pagina"
+    return re.sub(r"-{2,}", "-", s).strip("-") or "page"
 
 
 def _write_atomic(path: Path, content: str) -> None:
@@ -196,7 +188,7 @@ async def _identify_groups(
                 if g.get("canonico") and isinstance(g.get("duplicatas"), list)
             )
         except Exception as exc:  # noqa: BLE001
-            logger.warning("Consolidation lote %d falhou: %s", i, exc)
+            logger.warning("Consolidation batch %d failed: %s", i, exc)
 
     return groups
 
@@ -288,4 +280,4 @@ async def run_consolidate(
         for group in groups:
             result = _execute_merge(cfg.wiki_dir, subdir, group)
             if result["merged"]:
-                logger.info("  Merged %s → %s", result["merged"], result["canonical"])
+                logger.info("  Merged %s → %s", result["merged"], result["canonico"])

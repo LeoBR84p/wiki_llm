@@ -34,7 +34,7 @@ class LLMConfig(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Tipos de entidade, taxonomias e agrupamentos
+# Entity types, taxonomies and groupings
 # ---------------------------------------------------------------------------
 
 
@@ -115,7 +115,7 @@ class GroupingConfig(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# WikiConfig — contrato central do pipeline
+# WikiConfig — central pipeline contract
 # ---------------------------------------------------------------------------
 
 
@@ -152,34 +152,27 @@ class WikiConfig(BaseModel):
     log_dir: Path
     language: str = "english"
 
-    # LLM
     llm: LLMConfig
 
-    # Content — freely define any number of entity types, taxonomies, and groupings
     entity_types: list[EntityTypeConfig]
     taxonomies: list[TaxonomyConfig] = Field(default_factory=list)
     groupings: list[GroupingConfig] = Field(default_factory=list)
 
-    # Prompts comuns
     prompt_editor: Path
     prompt_lint: Path
     prompt_consolidate: Path
     prompt_chat: Path
 
-    # Comportamento
     status_filter: list[str] = Field(default_factory=list)
     max_chars_input: int = 80_000
     batch_size: int = 80
     on_llm_error: Literal["skip", "abort"] = "skip"
     export_word: bool = False
 
-    # Fonte de dados
     content_dir: Path = Path("content_new")
-    # Post-processing destinations (None = derived automatically from content_dir.parent)
     content_processed_dir: Path | None = None
     content_error_dir: Path | None = None
 
-    # Pluggable PDF reader — must implement PdfReaderProtocol
     pdf_reader: Any | None = None
 
     def get_processed_dir(self) -> Path:
