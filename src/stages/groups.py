@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 import time
-import uuid
 from pathlib import Path
 
 from jinja2 import Template
@@ -17,26 +16,14 @@ from ..llm.base import BaseLLMClient
 from ..llm.log import LLMLogger
 from ..models.config import GroupingConfig, WikiConfig
 from ..models.document import Document
+from ._utils import CHARS_INVALID, write_atomic
 
 logger = logging.getLogger(__name__)
 
-_CHARS_INVALID = frozenset('\\/:*?"<>|')
-
 
 def _safe_slug(name: str) -> str:
-    s = "".join(c if c not in _CHARS_INVALID else "-" for c in name)
+    s = "".join(c if c not in CHARS_INVALID else "-" for c in name)
     return s.strip(". ") or "unnamed-group"
-
-
-def _write_atomic(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_name(path.stem + f"._tmp_{uuid.uuid4().hex[:8]}" + path.suffix)
-    try:
-        tmp.write_text(content, encoding="utf-8")
-        tmp.replace(path)
-    except Exception:
-        tmp.unlink(missing_ok=True)
-        raise
 
 
 def _group_value(doc: Document, field: str) -> str | None:
@@ -186,5 +173,5 @@ async def run_groups(
                 )
             else:
                 content = _page_content(group_name, grp_cfg.metadata_field, group_docs, grp_cfg)
-            _write_atomic(dest, content)
+            write_atomic(dest, content)
             logger.info("  Grouping page generated: %s", dest.name)

@@ -15,41 +15,28 @@ import json
 import logging
 import re
 import time
-import uuid
 from pathlib import Path
 from typing import Any
 
 from ..llm.base import BaseLLMClient
 from ..llm.log import LLMLogger
 from ..models.config import WikiConfig
+from ._utils import CHARS_INVALID, SYSTEM_PAGES, write_atomic
 
 logger = logging.getLogger(__name__)
 
-_SYSTEM_PAGES = {"index.md", "log.md"}
 _BATCH_SIZE = 80
-_CHARS_INVALID = frozenset('\\/:*?"<>|')
 
 
 def _safe_slug(name: str) -> str:
-    s = "".join(c if c not in _CHARS_INVALID else "-" for c in name.lower().strip())
+    s = "".join(c if c not in CHARS_INVALID else "-" for c in name.lower().strip())
     return re.sub(r"-{2,}", "-", s).strip("-") or "page"
-
-
-def _write_atomic(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_name(path.stem + f"._tmp_{uuid.uuid4().hex[:8]}" + path.suffix)
-    try:
-        tmp.write_text(content, encoding="utf-8")
-        tmp.replace(path)
-    except Exception:
-        tmp.unlink(missing_ok=True)
-        raise
 
 
 def _collect_pages(subdir: Path) -> list[dict[str, str]]:
     pages = []
     for p in sorted(subdir.glob("*.md")):
-        if p.name in _SYSTEM_PAGES:
+        if p.name in SYSTEM_PAGES:
             continue
         text = p.read_text(encoding="utf-8")[:500]
         m = re.match(r"---\s*(.*?)\s*---", text, re.DOTALL)
@@ -79,7 +66,7 @@ def _replace_wikilinks(wiki_dir: Path, old_slug: str, new_slug: str) -> int:
     """
     count = 0
     for p in wiki_dir.rglob("*.md"):
-        if p.name in _SYSTEM_PAGES:
+        if p.name in SYSTEM_PAGES:
             continue
         text = p.read_text(encoding="utf-8")
         updated = text.replace(f"[[{old_slug}]]", f"[[{new_slug}]]")
@@ -125,7 +112,7 @@ def _add_aliases(path: Path, aliases: list[str]) -> None:
         )
     else:
         fm = fm.rstrip("\n") + f"\naliases: {json.dumps(aliases, ensure_ascii=False)}\n"
-    _write_atomic(path, f"---{fm}---{body}")
+    write_atomic(path, f"---{fm}---{body}")
 
 
 async def _identify_groups(
@@ -225,7 +212,7 @@ def _execute_merge(wiki_dir: Path, subdir_path: Path, group: dict[str, Any]) -> 
                 title_safe = canon_name.replace('"', "'")
                 text = re.sub(r"^(title:\s*).*$", f'\\1"{title_safe}"', text, flags=re.MULTILINE)
                 text = re.sub(r"^(# ).*", f"\\1{canon_name}", text, count=1, flags=re.MULTILINE)
-                _write_atomic(canon_path, text)
+                write_atomic(canon_path, text)
                 dup_path.unlink(missing_ok=True)
                 _replace_wikilinks(wiki_dir, dup_slug, canon_slug)
                 merged.append(dup_name)

@@ -13,9 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import textwrap
 import time
-import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -23,19 +21,18 @@ from typing import Any
 from jinja2 import Template
 from markdown_hero import normalize as md_normalize
 
-from ..llm.base import BaseLLMClient, LLMResponse
+from ..llm.base import BaseLLMClient
 from ..llm.log import LLMLogger
 from ..models.config import EntityTypeConfig, WikiConfig
 from ..models.document import Document
 from ..models.evaluation import PageEvaluation
+from ._utils import CHARS_INVALID, write_atomic
 
 logger = logging.getLogger(__name__)
 
-_CHARS_INVALID = frozenset('\\/:*?"<>|')
-
 
 def _safe_filename(s: str) -> str:
-    return "".join(c if c not in _CHARS_INVALID else "-" for c in s).strip(". ")
+    return "".join(c if c not in CHARS_INVALID else "-" for c in s).strip(". ")
 
 
 def _title_from_draft(draft: str) -> str | None:
@@ -51,41 +48,6 @@ def _truncate(text: str, max_chars: int) -> tuple[str, bool]:
     if len(text) <= max_chars:
         return text, False
     return text[:max_chars], True
-
-
-def _write_atomic(path: Path, content: str) -> None:
-    """Write content to path via a temporary file, then atomically rename.
-
-    Creates the parent directory tree if needed.  Writes to a uniquely named
-    sibling temp file first, then calls Path.replace() to atomically swap it
-    into place.  Retries up to 6 times with exponential back-off on
-    PermissionError (which Windows sometimes raises briefly on network drives).
-    Always removes the temp file if an unrecoverable error occurs.
-
-    Args:
-        path: Final destination path for the content.
-        content: UTF-8 text to write.
-
-    Raises:
-        PermissionError: If all 6 rename attempts fail.
-        Exception: Any other I/O error encountered during the write.
-    """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_name(path.stem + f"._tmp_{uuid.uuid4().hex[:8]}" + path.suffix)
-    try:
-        tmp.write_text(content, encoding="utf-8")
-        for attempt in range(6):
-            try:
-                tmp.replace(path)
-                return
-            except PermissionError:
-                if attempt == 5:
-                    tmp.unlink(missing_ok=True)
-                    raise
-                time.sleep(0.05 * (2 ** attempt))
-    except Exception:
-        tmp.unlink(missing_ok=True)
-        raise
 
 
 def _render_prompt(prompt_path: Path, context: dict[str, Any]) -> str:
@@ -141,7 +103,7 @@ def _write_raw_page(doc: Document, entity_cfg: EntityTypeConfig, wiki_dir: Path,
         "",
     ]
     full = "\n".join(fm_lines) + md_normalize(doc.content) + "\n"
-    _write_atomic(raw_path, full)
+    write_atomic(raw_path, full)
     return raw_path
 
 
@@ -396,7 +358,7 @@ async def generate_page(
 
         frontmatter = _build_frontmatter(doc, entity_cfg, generated_at)
         full_page = frontmatter + "\n" + draft.strip() + source_section
-        _write_atomic(dest, full_page)
+        write_atomic(dest, full_page)
         logger.info("Generated: %s", dest)
         return dest
 

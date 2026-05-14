@@ -17,7 +17,6 @@ import operator
 import re
 import threading
 import time
-import uuid
 from pathlib import Path
 from typing import Annotated, Any, TypedDict
 
@@ -27,11 +26,9 @@ from ..llm.base import BaseLLMClient
 from ..llm.log import LLMLogger
 from ..models.config import WikiConfig
 from ..models.evaluation import RepairState
+from ._utils import CHARS_INVALID, SYSTEM_PAGES, write_atomic
 
 logger = logging.getLogger(__name__)
-
-_CHARS_INVALID = frozenset('\\/:*?"<>|')
-_SYSTEM_PAGES = {"index.md", "log.md", "lint_report.md"}
 
 _file_locks: dict[str, threading.Lock] = {}
 _file_locks_meta = threading.Lock()
@@ -48,32 +45,8 @@ def _file_lock(path: Path) -> threading.Lock:
 
 
 def _safe_slug(name: str) -> str:
-    s = "".join(c if c not in _CHARS_INVALID else "-" for c in name.lower().strip())
+    s = "".join(c if c not in CHARS_INVALID else "-" for c in name.lower().strip())
     return re.sub(r"-{2,}", "-", s).strip("-") or "page"
-
-
-def _write_atomic(path: Path, content: str, skip_if_exists: bool = False) -> bool:
-    """Write content to path atomically via a temporary file and rename.
-
-    Args:
-        path: Destination file path.
-        content: UTF-8 text to write.
-        skip_if_exists: When True, returns False immediately if the file already exists.
-
-    Returns:
-        True if the file was written, False if skipped due to skip_if_exists.
-    """
-    if skip_if_exists and path.exists():
-        return False
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_name(path.stem + f"._tmp_{uuid.uuid4().hex[:8]}" + path.suffix)
-    try:
-        tmp.write_text(content, encoding="utf-8")
-        tmp.replace(path)
-        return True
-    except Exception:
-        tmp.unlink(missing_ok=True)
-        raise
 
 
 def _find_page(wiki_dir: Path, stem: str) -> Path | None:
@@ -245,7 +218,7 @@ async def _repair_broken_link(
             )
             content = f"{fm}\n# {target}\n\n{resp.text.strip()}\n\n"
             content += "## Referenciado em\n\n" + source_links + "\n"
-            _write_atomic(dest_path, content, skip_if_exists=True)
+            write_atomic(dest_path, content, skip_if_exists=True)
             return [target], []
         except Exception as exc:  # noqa: BLE001
             return [], [f"broken_link:{target}:{exc}"]
@@ -283,7 +256,7 @@ async def _repair_orphan(
         return [], [f"orphan:{target}:file not found"]
 
     # List all page ids as candidates
-    candidate_ids = [p.stem for p in wiki_dir.rglob("*.md") if p.name not in _SYSTEM_PAGES and p.stem != target]
+    candidate_ids = [p.stem for p in wiki_dir.rglob("*.md") if p.name not in SYSTEM_PAGES and p.stem != target]
     candidates_text = "\n".join(f"- {c}" for c in candidate_ids[:100])
 
     system = cfg.prompt_lint.read_text(encoding="utf-8")

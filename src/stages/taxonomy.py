@@ -12,7 +12,6 @@ import logging
 import os
 import re
 import time
-import uuid
 from pathlib import Path
 
 from jinja2 import Template
@@ -20,28 +19,16 @@ from jinja2 import Template
 from ..llm.base import BaseLLMClient
 from ..llm.log import LLMLogger
 from ..models.config import TaxonomyConfig, WikiConfig
+from ._utils import CHARS_INVALID, SYSTEM_PAGES, write_atomic
 
 logger = logging.getLogger(__name__)
 
 _RE_WIKILINK = re.compile(r"\[\[([^\]]+)\]\]")
-
-
-def _write_atomic(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_name(path.stem + f"._tmp_{uuid.uuid4().hex[:8]}" + path.suffix)
-    try:
-        tmp.write_text(content, encoding="utf-8")
-        tmp.replace(path)
-    except Exception:
-        tmp.unlink(missing_ok=True)
-        raise
 _RE_MDLINK = re.compile(r"\[([^\]]+)\]\([^)]+\)")
-_CHARS_INVALID = frozenset('\\/:*?"<>|')
-_SYSTEM_PAGES = {"index.md", "log.md"}
 
 
 def _safe_slug(name: str) -> str:
-    s = "".join(c if c not in _CHARS_INVALID else "-" for c in name)
+    s = "".join(c if c not in CHARS_INVALID else "-" for c in name)
     return s.strip(". ") or "unnamed-term"
 
 
@@ -84,7 +71,7 @@ def _collect_terms_from_sections(wiki_dir: Path, tax_cfg: TaxonomyConfig) -> dic
     terms: dict[str, list[str]] = {}
 
     for md_file in wiki_dir.rglob("*.md"):
-        if md_file.name in _SYSTEM_PAGES:
+        if md_file.name in SYSTEM_PAGES:
             continue
         if tax_cfg.wiki_subdir in md_file.parts:
             continue
@@ -128,7 +115,7 @@ def _collect_terms_from_frontmatter(wiki_dir: Path, tax_cfg: TaxonomyConfig) -> 
     terms: dict[str, list[str]] = {}
 
     for md_file in wiki_dir.rglob("*.md"):
-        if md_file.name in _SYSTEM_PAGES:
+        if md_file.name in SYSTEM_PAGES:
             continue
         if tax_cfg.wiki_subdir in md_file.parts:
             continue
@@ -322,7 +309,7 @@ async def generate_taxonomy_pages(
                 cached_tokens=resp.cached_tokens, model_id=resp.model_id,
                 stage="taxonomy.create_page", elapsed=time.monotonic() - t0,
             )
-            _write_atomic(dest, resp.text)
+            write_atomic(dest, resp.text)
             logger.info("Taxonomy page generated: %s", dest)
         except Exception as exc:  # noqa: BLE001
             logger.error("Error generating taxonomy page '%s': %s", norm_term, exc)

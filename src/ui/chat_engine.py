@@ -21,15 +21,13 @@ from markdown_hero import extract_chunks
 
 from ..llm.base import BaseLLMClient, LLMResponse
 from ..models.config import WikiConfig
+from ..stages._utils import SYSTEM_PAGES
 
 _STOPWORDS = frozenset({
     "de", "da", "do", "das", "dos", "em", "no", "na", "nos", "nas",
     "a", "o", "e", "que", "com", "para", "por", "se", "ou", "um", "uma",
     "como", "qual", "quais", "sobre", "entre", "tem", "deve", "pode",
 })
-
-_SYSTEM_PAGES = {"index.md", "lint_report.md"}
-
 
 def _tokenize(text: str) -> list[str]:
     """Tokenize Markdown text for BM25 indexing.
@@ -95,7 +93,7 @@ class ChatEngine:
         tokenized: list[list[str]] = []
 
         for p in self._cfg.wiki_dir.rglob("*.md"):
-            if p.name in _SYSTEM_PAGES or p.stem.startswith("lint_"):
+            if p.name in SYSTEM_PAGES or p.stem.startswith("lint_"):
                 continue
             text = p.read_text(encoding="utf-8")
             # Extract RAG chunks (headers + content)

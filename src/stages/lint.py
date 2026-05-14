@@ -12,7 +12,6 @@ from __future__ import annotations
 import logging
 import re
 import time
-import uuid
 from pathlib import Path
 from typing import Any
 
@@ -20,10 +19,9 @@ from ..llm.base import BaseLLMClient
 from ..llm.log import LLMLogger
 from ..models.config import WikiConfig
 from ..models.evaluation import RepairState
+from ._utils import SYSTEM_PAGES
 
 logger = logging.getLogger(__name__)
-
-_EXCLUDE_FILES = {"index.md", "log.md", "lint_report.md"}
 
 
 def _extract_wikilinks(text: str) -> set[str]:
@@ -33,7 +31,7 @@ def _extract_wikilinks(text: str) -> set[str]:
 def _load_pages(wiki_dir: Path) -> dict[str, str]:
     pages: dict[str, str] = {}
     for p in wiki_dir.rglob("*.md"):
-        if p.name in _EXCLUDE_FILES or p.stem.startswith("lint_"):
+        if p.name in SYSTEM_PAGES or p.stem.startswith("lint_"):
             continue
         pages[p.stem] = p.read_text(encoding="utf-8")
     return pages
