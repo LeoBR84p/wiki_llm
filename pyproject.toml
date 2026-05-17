@@ -1,0 +1,56 @@
+[project]
+name = "wiki-llm"
+version = "0.1.0"
+description = "Wiki generation tool using LLMs"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "markdown-hero",
+    "pydantic>=2.0",
+    "typer>=0.12",
+    "instructor>=1.0",
+    "openai>=1.0",
+    "boto3>=1.34",
+    "botocore>=1.34",
+    "markitdown[docx,pptx,xlsx,pdf]>=0.1",
+    "rank-bm25>=0.2",
+    "jinja2>=3.1",
+    "nicegui>=1.4",
+    "python-dotenv>=1.0",
+    "langgraph>=0.1",
+    "rich>=14.3.4",
+    "questionary>=2.1.1",
+]
+
+[project.scripts]
+wiki-llm = "src.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "--cov=src --cov-report=term-missing --cov-fail-under=70"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["src/ui/*", "src/__main__.py", "src/cli.py", "src/setup_wizard.py"]
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true
+
+[tool.uv]
+package = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.1.0",
+]

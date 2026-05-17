@@ -1,0 +1,42 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Secret files
+.env
+.env.bak
+
+# Claude Code
+.claude
+
+# Test and coverage artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Wiki content (generated)
+wiki/
+content_*/
+logs/
+
+# Planning files
+TODO.md
+PLAN.md
+
+# Office and document files
+*.doc
+*.docx
+*.pdf
+*.ppt
+*.pptx
+*.xls
+*.xlsx
+*.txt
