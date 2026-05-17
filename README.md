@@ -77,6 +77,17 @@ pip install wiki-llm
 
 ---
 
+## Installation-free agent workflow
+
+If you want to run this project logic directly from an AI coding assistant without installing this repository as a package, use the instruction files below:
+
+- [AGENTS.md](AGENTS.md): canonical workflow and stage-by-stage pipeline rules (setup, read, generate, topics, groups, index, consolidate, lint, repair).
+- [CLAUDE.md](CLAUDE.md): Claude-focused entry point that delegates to `AGENTS.md`.
+
+This mode is useful when you want a lightweight, prompt-driven execution model where the assistant follows the documented pipeline and writes wiki outputs directly in your workspace.
+
+---
+
 ## Quick start
 
 **1. Set up your secrets:**
@@ -281,6 +292,7 @@ WIKI_UI_PORT=8080
 
 - Full configuration example: [`config/exemplo_normas.py`](config/exemplo_normas.py)
 - markdown-hero reference: [docs/reference.md](https://github.com/LeoBR84p/markdown_hero/blob/main/docs/reference.md)
+- Medium article (more context and background): [Building wiki-llm with agent-driven workflows](https://medium.com/@bernardo.leandro/08b31170999a?sk=03579bb6d5a6f297495025a8d311ea08)
 
 ---
 
